@@ -196,6 +196,15 @@ section { padding-block: clamp(4rem, 8vw, 6.5rem); }
 .service p { color: var(--encre-douce); font-size: .98rem; }
 .service ul { margin: .3rem 0 0; padding: 0; list-style: none; display: grid; gap: .35rem; font: 400 .8rem/1.4 var(--f-mono); color: var(--encre-douce); }
 .service ul li::before { content: "› "; color: var(--accent); }
+[hidden] { display: none !important; }
+.projets-filtres { margin-bottom: 1.75rem; }
+#projets-liste { background: none; border: 0; border-radius: 0; overflow: visible; gap: 1.25rem; }
+.projet { border: 1px solid var(--trait); border-radius: 14px; }
+.projet .categories { display: flex; flex-wrap: wrap; gap: .4rem; }
+.projet .categories span { font: 500 .72rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-doux); padding: .35rem .55rem; border-radius: 6px; }
+.projet img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid var(--trait); }
+.projet .lien-code { font: 500 .85rem/1 var(--f-mono); text-decoration: none; margin-top: .4rem; }
+.projet .lien-code:hover { text-decoration: underline; }
 
 /* Méthode */
 .methode { background: var(--nuit); color: var(--sur-nuit); }
