@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://juan-fajardo.pages.dev/sitemap.xml

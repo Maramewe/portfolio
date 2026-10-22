@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<style>.t{stroke:#0f1a2e}.b{stroke:#2348c9}@media (prefers-color-scheme:dark){.t{stroke:#e7ecf6}.b{stroke:#7f9eff}}</style>
+<path class="t" d="M16 3 27 7.5v8.2c0 6.6-4.6 11.4-11 13.3C9.6 27.1 5 22.3 5 15.7V7.5z" fill="none" stroke-width="2.6" stroke-linejoin="round"/>
+<path class="b" d="M11 16h10" stroke-width="3.2" stroke-linecap="round"/>
+</svg>

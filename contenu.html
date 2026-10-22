@@ -1,0 +1,1794 @@
+<title>Juan Fajardo · Réseaux, Cloud et Cybersécurité</title>
+<script>
+// Thème choisi avec le bouton de l'en-tête, appliqué avant l'affichage pour éviter un flash
+try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Mise en page : une colonne de lecture large (72rem), sections séparées par l'espace et non par des cadres ;
+   le seul objet « encadré » fort est le rapport d'audit, signature visuelle du site. */
+:root {
+  --fond: #f3f5f9;
+  --surface: #ffffff;
+  --encre: #0f1a2e;
+  --encre-douce: #4a5670;
+  --trait: #d9dfe9;
+  --accent: #2348c9;
+  --accent-doux: #e4eafc;
+  --sur-accent: #ffffff;
+  --crit: #b4232a;
+  --haut: #d0631c;
+  --moyen: #a77d00;
+  --bas: #2f7d55;
+  --nuit: #0f1a2e;
+  --sur-nuit: #e7ecf6;
+  --sur-nuit-doux: #9aa6bf;
+  --f-titre: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-texte: "Public Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --largeur: 72rem;
+  --rayon: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fond: #0b1220; --surface: #121b2d; --encre: #e7ecf6; --encre-douce: #9aa6bf; --trait: #24314a;
+    --accent: #7f9eff; --accent-doux: #1a2850; --sur-accent: #0b1220;
+    --crit: #ff6b6b; --haut: #ff9a52; --moyen: #e8c14a; --bas: #5cc98d;
+    --nuit: #070c17; --sur-nuit: #e7ecf6; --sur-nuit-doux: #8d99b3;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fond: #0b1220; --surface: #121b2d; --encre: #e7ecf6; --encre-douce: #9aa6bf; --trait: #24314a;
+  --accent: #7f9eff; --accent-doux: #1a2850; --sur-accent: #0b1220;
+  --crit: #ff6b6b; --haut: #ff9a52; --moyen: #e8c14a; --bas: #5cc98d;
+  --nuit: #070c17; --sur-nuit: #e7ecf6; --sur-nuit-doux: #8d99b3;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body {
+  margin: 0; background: var(--fond); color: var(--encre);
+  font: 400 1.0625rem/1.65 var(--f-texte);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--f-titre); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.6rem); line-height: 1.12; font-weight: 700; }
+h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; }
+p { margin: 0; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.mono { font-family: var(--f-mono); }
+
+.enveloppe { max-width: var(--largeur); margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem); }
+section { padding-block: clamp(4rem, 8vw, 6.5rem); }
+.surtitre {
+  font: 500 0.78rem/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1rem; display: block;
+}
+.entete-section { display: grid; gap: 1rem; max-width: 44rem; margin-bottom: 3rem; }
+.entete-section p { color: var(--encre-douce); font-size: 1.125rem; }
+
+.bouton {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 1.35rem;
+  border-radius: 999px; font: 600 1rem/1 var(--f-texte); text-decoration: none; cursor: pointer;
+  border: 1.5px solid transparent; transition: transform .15s ease, background-color .15s ease;
+}
+.bouton:hover { transform: translateY(-1px); }
+.bouton-plein { background: var(--accent); color: var(--sur-accent); }
+.bouton-contour { border-color: var(--trait); color: var(--encre); background: transparent; }
+.bouton-contour:hover { border-color: var(--encre-douce); }
+
+/* En-tête */
+.barre {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: color-mix(in srgb, var(--fond) 88%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--trait);
+}
+.barre .enveloppe { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 4.25rem; }
+.marque { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--encre); font: 700 1.2rem/1 var(--f-titre); }
+.marque svg { width: 1.9rem; height: 1.9rem; flex: none; }
+.marque small { display: block; font: 500 0.68rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--encre-douce); margin-top: .25rem; }
+.nav { display: flex; align-items: center; gap: 1.6rem; }
+.nav a { color: var(--encre-douce); text-decoration: none; font-weight: 500; font-size: .95rem; }
+.nav a:hover { color: var(--encre); }
+.nav .bouton { color: var(--sur-accent); padding: .65rem 1.1rem; font-size: .92rem; }
+@media (max-width: 860px) { .nav a:not(.bouton) { display: none; } }
+
+/* Accroche */
+.accroche { padding-block: clamp(3rem, 7vw, 5.5rem) clamp(3.5rem, 7vw, 5.5rem); position: relative; overflow: hidden; isolation: isolate; }
+.reseau3d { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none; }
+.accroche::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, var(--fond) 0%, color-mix(in srgb, var(--fond) 70%, transparent) 38%, transparent 70%); }
+@media (max-width: 960px) {
+  .reseau3d { opacity: .5; }
+  .accroche::before { background: linear-gradient(180deg, color-mix(in srgb, var(--fond) 55%, transparent), color-mix(in srgb, var(--fond) 85%, transparent)); }
+}
+.accroche .enveloppe { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+@media (max-width: 960px) { .accroche .enveloppe { grid-template-columns: 1fr; } }
+.accroche h1 { font-size: clamp(2.4rem, 1.4rem + 4.2vw, 4.4rem); line-height: 1.02; font-weight: 700; letter-spacing: -0.025em; }
+.accroche h1 em { font-style: normal; color: var(--accent); }
+.accroche .chapeau { font-size: 1.2rem; color: var(--encre-douce); max-width: 34rem; margin-top: 1.5rem; }
+.accroche .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+.preuves { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-top: 2.5rem; padding: 0; list-style: none; font-size: .92rem; color: var(--encre-douce); }
+.preuves li { display: flex; align-items: center; gap: .45rem; }
+.preuves li::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--bas); }
+
+/* Rapport (signature) */
+.rapport {
+  background: var(--surface); border: 1px solid var(--trait); border-radius: 14px;
+  box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--encre) 35%, transparent);
+  overflow: hidden; min-width: 0;
+}
+.rapport-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1.1rem 1.35rem; border-bottom: 1px solid var(--trait); flex-wrap: wrap; }
+.rapport-tete b { font: 600 1rem/1.2 var(--f-titre); }
+.rapport-tete span { font: 400 .75rem/1 var(--f-mono); color: var(--encre-douce); }
+.compte { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--trait); }
+.compte div { padding: .9rem 1.35rem; border-right: 1px solid var(--trait); }
+.compte div:last-child { border-right: 0; }
+.compte strong { display: block; font: 600 1.6rem/1 var(--f-titre); font-variant-numeric: tabular-nums; }
+.compte small { font: 500 .68rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--encre-douce); }
+.c-accent strong { color: var(--accent); } .c-crit strong { color: var(--crit); } .c-haut strong { color: var(--haut); } .c-moyen strong { color: var(--moyen); } .c-bas strong { color: var(--bas); }
+.constats { list-style: none; margin: 0; padding: .4rem 0; }
+.constat { display: grid; grid-template-columns: 3.2rem 1fr auto; gap: .9rem; align-items: center; padding: .7rem 1.35rem; }
+.constat + .constat { border-top: 1px dashed var(--trait); }
+.constat .id { font: 400 .75rem/1 var(--f-mono); color: var(--encre-douce); }
+.constat p { font-size: .93rem; line-height: 1.35; min-width: 0; }
+.constat p small { display: block; font: 400 .74rem/1.4 var(--f-mono); color: var(--encre-douce); margin-top: .2rem; }
+.score { font: 500 .78rem/1 var(--f-mono); padding: .35rem .55rem; border-radius: 6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.s-crit { color: var(--crit); background: color-mix(in srgb, var(--crit) 12%, transparent); }
+.s-haut { color: var(--haut); background: color-mix(in srgb, var(--haut) 13%, transparent); }
+.s-moyen { color: var(--moyen); background: color-mix(in srgb, var(--moyen) 14%, transparent); }
+.s-bas { color: var(--bas); background: color-mix(in srgb, var(--bas) 13%, transparent); }
+.rapport-pied { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .8rem 1.35rem; background: var(--accent-doux); font: 400 .75rem/1.4 var(--f-mono); color: var(--encre-douce); }
+.balayage { position: relative; }
+.balayage::after {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--accent); opacity: .0;
+  animation: balaye 2.6s ease-in-out .4s 1 both;
+}
+@keyframes balaye { 0% { top: 0; opacity: .0; } 10% { opacity: .8; } 90% { opacity: .8; } 100% { top: 100%; opacity: 0; } }
+.constat { animation: apparait .5s ease both; }
+.constat:nth-child(1) { animation-delay: .5s; } .constat:nth-child(2) { animation-delay: 1s; }
+.constat:nth-child(3) { animation-delay: 1.5s; } .constat:nth-child(4) { animation-delay: 2s; } .constat:nth-child(5) { animation-delay: 2.5s; }
+@keyframes apparait { from { opacity: .25; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+@media (max-width: 520px) {
+  .compte { grid-template-columns: repeat(2, 1fr); }
+  .compte div:nth-child(2) { border-right: 0; }
+  .compte div:nth-child(-n+2) { border-bottom: 1px solid var(--trait); }
+  .constat { grid-template-columns: 1fr auto; }
+  .constat .id { display: none; }
+}
+
+/* Bandeau des référentiels */
+.referentiels { border-block: 1px solid var(--trait); padding-block: 1.6rem; }
+.referentiels .enveloppe { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2.5rem; }
+.referentiels span { font: 500 .78rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--encre-douce); }
+.referentiels ul { display: flex; flex-wrap: wrap; gap: .6rem 2rem; list-style: none; margin: 0; padding: 0; font: 600 1rem/1.2 var(--f-titre); }
+
+/* Services */
+.services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--trait); border: 1px solid var(--trait); border-radius: 14px; overflow: hidden; }
+@media (max-width: 960px) { .services { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .services { grid-template-columns: 1fr; } }
+.service { background: var(--surface); padding: 2rem 1.75rem; display: grid; gap: .8rem; align-content: start; min-width: 0; }
+.service svg { width: 2rem; height: 2rem; color: var(--accent); }
+.service p { color: var(--encre-douce); font-size: .98rem; }
+.service ul { margin: .3rem 0 0; padding: 0; list-style: none; display: grid; gap: .35rem; font: 400 .8rem/1.4 var(--f-mono); color: var(--encre-douce); }
+.service ul li::before { content: "› "; color: var(--accent); }
+
+/* Méthode */
+.methode { background: var(--nuit); color: var(--sur-nuit); }
+.methode .surtitre { color: var(--sur-nuit-doux); }
+.methode .entete-section p { color: var(--sur-nuit-doux); }
+.etapes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem 2rem; counter-reset: etape; }
+@media (max-width: 860px) { .etapes { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .etapes { grid-template-columns: 1fr; } }
+.etapes li { counter-increment: etape; border-top: 1px solid color-mix(in srgb, var(--sur-nuit) 22%, transparent); padding-top: 1.25rem; display: grid; gap: .55rem; min-width: 0; }
+.etapes li::before { content: "Étape " counter(etape, decimal-leading-zero); font: 500 .75rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: #7f9eff; }
+.etapes p { color: var(--sur-nuit-doux); font-size: .98rem; }
+.etapes .duree { font: 400 .78rem/1 var(--f-mono); color: var(--sur-nuit); opacity: .75; }
+
+/* Livrable */
+.livrable { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+@media (max-width: 900px) { .livrable { grid-template-columns: 1fr; } }
+.contenu-rapport { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; gap: 1.25rem; }
+.contenu-rapport li { display: grid; grid-template-columns: 2rem 1fr; gap: .9rem; }
+.contenu-rapport li svg { width: 1.4rem; height: 1.4rem; color: var(--accent); margin-top: .2rem; }
+.contenu-rapport b { display: block; font-family: var(--f-titre); font-size: 1.05rem; }
+.contenu-rapport span { color: var(--encre-douce); font-size: .97rem; }
+.fiche { background: var(--surface); border: 1px solid var(--trait); border-radius: 14px; overflow: hidden; min-width: 0; }
+.fiche-tete { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--trait); display: grid; gap: .6rem; }
+.fiche-tete .ligne { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: center; }
+.fiche-tete .ref { font: 400 .78rem/1 var(--f-mono); color: var(--encre-douce); }
+.fiche dl { margin: 0; display: grid; grid-template-columns: 9.5rem 1fr; }
+.fiche dt, .fiche dd { padding: .8rem 1.5rem; border-bottom: 1px solid var(--trait); margin: 0; font-size: .93rem; min-width: 0; }
+.fiche dt { font: 500 .74rem/1.5 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--encre-douce); padding-top: .95rem; }
+.fiche dd code { font: 400 .8rem/1.5 var(--f-mono); background: var(--accent-doux); padding: .1rem .35rem; border-radius: 4px; overflow-wrap: anywhere; }
+.fiche .vecteur { font: 400 .76rem/1.5 var(--f-mono); color: var(--encre-douce); overflow-wrap: anywhere; }
+.fiche dd ol { margin: 0; padding-left: 1.1rem; display: grid; gap: .25rem; }
+.fiche-pied { padding: .8rem 1.5rem; font: 400 .74rem/1.4 var(--f-mono); color: var(--encre-douce); background: var(--accent-doux); }
+@media (max-width: 560px) { .fiche dl { grid-template-columns: 1fr; } .fiche dt { border-bottom: 0; padding-bottom: 0; } }
+
+/* Estimateur */
+.estimateur { display: grid; grid-template-columns: 1.2fr 1fr; background: var(--surface); border: 1px solid var(--trait); border-radius: 14px; overflow: hidden; }
+@media (max-width: 860px) { .estimateur { grid-template-columns: 1fr; } }
+.estimateur form { padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: 1.6rem; min-width: 0; }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: .6rem; min-width: 0; }
+legend, .etiquette { font: 600 .95rem/1.3 var(--f-texte); margin-bottom: .6rem; padding: 0; }
+.choix { display: flex; flex-wrap: wrap; gap: .5rem; }
+.choix label { position: relative; }
+.choix input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.choix span { display: block; padding: .55rem .95rem; border: 1.5px solid var(--trait); border-radius: 999px; font-size: .92rem; cursor: pointer; transition: border-color .15s, background-color .15s; }
+.choix input:checked + span { border-color: var(--accent); background: var(--accent-doux); color: var(--encre); font-weight: 600; }
+.choix input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.curseur { display: grid; gap: .4rem; }
+.curseur .haut { display: flex; justify-content: space-between; gap: 1rem; }
+.curseur output { font: 500 .95rem/1 var(--f-mono); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.resultat { background: var(--nuit); color: var(--sur-nuit); padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: 1.4rem; align-content: start; }
+.resultat .surtitre { color: var(--sur-nuit-doux); margin: 0; }
+.resultat .prix { font: 700 clamp(2rem, 1.5rem + 2vw, 2.8rem)/1 var(--f-titre); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.resultat .prix small { font: 500 .9rem/1 var(--f-texte); color: var(--sur-nuit-doux); letter-spacing: 0; }
+.resultat dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .55rem 1.25rem; font-size: .93rem; }
+.resultat dt { color: var(--sur-nuit-doux); }
+.resultat dd { margin: 0; text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.resultat .note { font-size: .82rem; color: var(--sur-nuit-doux); }
+.resultat .bouton { justify-self: start; background: var(--sur-nuit); color: var(--nuit); }
+
+/* Offres */
+.offres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+@media (max-width: 900px) { .offres { grid-template-columns: 1fr; } }
+.offre { border: 1px solid var(--trait); border-radius: 14px; padding: 2rem 1.75rem; display: grid; gap: 1rem; align-content: start; background: var(--surface); }
+.offre.phare { border: 2px solid var(--accent); }
+.offre .pastille { justify-self: start; font: 500 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: .4rem .6rem; border-radius: 6px; background: var(--accent-doux); color: var(--accent); }
+.offre .tarif { font: 700 2rem/1 var(--f-titre); font-variant-numeric: tabular-nums; }
+.offre .tarif small { font: 400 .85rem/1 var(--f-texte); color: var(--encre-douce); }
+.offre > p { color: var(--encre-douce); font-size: .97rem; }
+.offre ul { list-style: none; margin: 0; padding: 1rem 0 0; border-top: 1px solid var(--trait); display: grid; gap: .55rem; font-size: .95rem; }
+.offre ul li { display: grid; grid-template-columns: 1.1rem 1fr; gap: .5rem; }
+.offre ul li::before { content: "✓"; color: var(--bas); font-weight: 700; }
+
+/* Engagements */
+.engagements { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+@media (max-width: 960px) { .engagements { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .engagements { grid-template-columns: 1fr; } }
+.engagements div { display: grid; gap: .6rem; align-content: start; min-width: 0; }
+.engagements h3 { font-size: 1.08rem; }
+.engagements p { color: var(--encre-douce); font-size: .96rem; }
+.engagements .loi { font: 400 .76rem/1.4 var(--f-mono); color: var(--accent); }
+
+/* Questions */
+.questions { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(2rem, 5vw, 4rem); }
+@media (max-width: 860px) { .questions { grid-template-columns: 1fr; } }
+details { border-bottom: 1px solid var(--trait); }
+details:first-of-type { border-top: 1px solid var(--trait); }
+summary { cursor: pointer; list-style: none; padding: 1.2rem 2.5rem 1.2rem 0; position: relative; font: 600 1.08rem/1.35 var(--f-titre); }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: .25rem; top: 1.05rem; font: 400 1.4rem/1 var(--f-mono); color: var(--accent); transition: transform .2s; }
+details[open] summary::after { transform: rotate(45deg); }
+details p { padding: 0 0 1.3rem; color: var(--encre-douce); max-width: 60ch; }
+
+/* Contact */
+.contact { background: var(--nuit); color: var(--sur-nuit); }
+.contact .enveloppe { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(2rem, 5vw, 4.5rem); }
+@media (max-width: 900px) { .contact .enveloppe { grid-template-columns: 1fr; } }
+.contact .surtitre { color: var(--sur-nuit-doux); }
+.contact .intro p { color: var(--sur-nuit-doux); margin-top: 1rem; font-size: 1.1rem; }
+.coordonnees { list-style: none; padding: 0; margin: 2.25rem 0 0; display: grid; gap: 1.1rem; }
+.coordonnees li { display: grid; gap: .25rem; }
+.coordonnees small { font: 500 .72rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--sur-nuit-doux); }
+.coordonnees a { color: var(--sur-nuit); text-underline-offset: .2em; }
+.coordonnees .valeur { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; font: 600 1.15rem/1.3 var(--f-titre); user-select: all; }
+.copier { font: 500 .75rem/1 var(--f-mono); background: transparent; color: var(--sur-nuit); border: 1px solid color-mix(in srgb, var(--sur-nuit) 30%, transparent); border-radius: 6px; padding: .4rem .6rem; cursor: pointer; user-select: none; }
+.copier:hover { border-color: var(--sur-nuit); }
+.formulaire { background: var(--surface); color: var(--encre); border-radius: 14px; padding: clamp(1.5rem, 3vw, 2.25rem); display: grid; gap: 1.1rem; min-width: 0; }
+.deux { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+@media (max-width: 560px) { .deux { grid-template-columns: 1fr; } }
+.champ { display: grid; gap: .4rem; min-width: 0; }
+.champ label { font-weight: 600; font-size: .9rem; }
+.champ input, .champ select, .champ textarea {
+  font: inherit; font-size: 1rem; color: var(--encre); background: var(--fond);
+  border: 1.5px solid var(--trait); border-radius: 8px; padding: .7rem .8rem; width: 100%;
+}
+.champ textarea { min-height: 7.5rem; resize: vertical; }
+.champ input:focus, .champ select:focus, .champ textarea:focus { outline: none; border-color: var(--accent); }
+.case { display: grid; grid-template-columns: auto 1fr; gap: .6rem; font-size: .88rem; color: var(--encre-douce); align-items: start; }
+.case input { margin-top: .3rem; accent-color: var(--accent); }
+.formulaire .bouton { justify-self: start; }
+.message { font-size: .92rem; padding: .9rem 1rem; border-radius: 8px; background: var(--accent-doux); }
+.message.erreur { background: color-mix(in srgb, var(--crit) 12%, transparent); color: var(--crit); }
+
+/* Pied */
+.pied { background: var(--nuit); color: var(--sur-nuit-doux); border-top: 1px solid color-mix(in srgb, var(--sur-nuit) 12%, transparent); padding-block: 2rem; font-size: .85rem; }
+.pied .enveloppe { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.pied a { color: var(--sur-nuit); }
+
+/* Lien d'évitement et bascule de thème */
+.evitement { position: absolute; left: 1rem; top: -4rem; z-index: 20; background: var(--accent); color: var(--sur-accent); padding: .75rem 1.1rem; border-radius: 8px; font-weight: 600; text-decoration: none; }
+.evitement:focus { top: 1rem; }
+.bascule-theme { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: none; border-radius: 50%; border: 1px solid var(--trait); background: transparent; color: var(--encre); cursor: pointer; transition: border-color .15s, transform .3s; }
+.bascule-theme:hover { border-color: var(--encre-douce); transform: rotate(-20deg); }
+.bascule-theme svg { width: 1.15rem; height: 1.15rem; }
+.icone-soleil { display: none; }
+:root[data-theme="dark"] .icone-soleil { display: block; }
+:root[data-theme="dark"] .icone-lune { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icone-soleil { display: block; }
+  :root:not([data-theme="light"]) .icone-lune { display: none; }
+}
+.pied nav { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; }
+
+/* Pages de texte (mentions légales, confidentialité, 404), fabriquées par construire.py */
+.page-texte { padding-block: clamp(3rem, 7vw, 5rem) clamp(4rem, 8vw, 6.5rem); min-height: 60vh; }
+.page-texte .enveloppe { max-width: 48rem; }
+.page-texte h1 { font-size: clamp(2rem, 1.4rem + 2.5vw, 3rem); line-height: 1.05; letter-spacing: -0.02em; margin-bottom: .75rem; }
+.page-texte .maj { font: 400 .8rem/1.4 var(--f-mono); color: var(--encre-douce); }
+.page-texte h2 { font-size: 1.3rem; margin: 2.75rem 0 .75rem; }
+.page-texte p, .page-texte li, .page-texte dd { color: var(--encre-douce); }
+.page-texte ul { padding-left: 1.2rem; display: grid; gap: .4rem; }
+.page-texte dl { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 0; }
+.page-texte dt { font: 500 .78rem/1.6 var(--f-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--encre); }
+.page-texte dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .page-texte dl { grid-template-columns: 1fr; } .page-texte dd { margin-bottom: .6rem; } }
+.page-texte .code-erreur { font: 500 clamp(4rem, 3rem + 6vw, 8rem)/1 var(--f-mono); color: var(--accent); letter-spacing: -0.04em; }
+.page-texte .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+
+/* Animations, 3D et effets à la souris */
+.methode { position: relative; overflow: hidden; isolation: isolate; }
+.terrain3d { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: .6;
+  -webkit-mask-image: linear-gradient(180deg, transparent 5%, #000 55%); mask-image: linear-gradient(180deg, transparent 5%, #000 55%); }
+.lueur { background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%); }
+.inclinable { transition: transform .6s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+.a-reveler { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.2,.7,.2,1) var(--delai, 0s), transform .8s cubic-bezier(.2,.7,.2,1) var(--delai, 0s); }
+.a-reveler.revele { opacity: 1; transform: none; }
+@keyframes monte { from { opacity: 0; transform: translateY(18px); } }
+@keyframes mot { from { transform: translateY(110%); } }
+@keyframes carte-arrive { from { opacity: 0; transform: perspective(1000px) translateY(48px) rotateX(14deg) scale(.95); } }
+@keyframes scan { from { top: 0; opacity: 1; } 80% { opacity: .9; } to { top: 100%; opacity: 0; } }
+.accroche h1 { animation: monte .4s ease .1s backwards; }
+.accroche .mot { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+.accroche .mot > span { display: inline-block; animation: mot .9s cubic-bezier(.2,.8,.2,1) calc(.25s + var(--i) * 65ms) backwards; }
+.accroche .surtitre { animation: monte .7s cubic-bezier(.2,.7,.2,1) .1s backwards; }
+.accroche .chapeau { animation: monte .8s cubic-bezier(.2,.7,.2,1) .9s backwards; }
+.accroche .actions { animation: monte .8s cubic-bezier(.2,.7,.2,1) 1.05s backwards; }
+.accroche .preuves { animation: monte .8s cubic-bezier(.2,.7,.2,1) 1.2s backwards; }
+.accroche .rapport { animation: carte-arrive 1.2s cubic-bezier(.2,.7,.2,1) .55s backwards; }
+.accroche::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: -1; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--bas) 70%, transparent); box-shadow: 0 0 18px var(--accent);
+  animation: scan 1.8s cubic-bezier(.6,0,.3,1) .1s backwards; }
+
+/* Objectifs : liste simple par défaut, scène animée au défilement quand le script l'active */
+.objectifs { position: relative; padding: 0; }
+.objectifs-scene { position: relative; padding-block: clamp(4rem, 8vw, 6.5rem); }
+.objectifs3d, .objectifs-rail { display: none; }
+.objectifs-texte h2 { max-width: 30rem; }
+.objectifs-liste { list-style: none; margin: 2.25rem 0 0; padding: 0; display: grid; gap: 1.75rem; }
+.objectif { display: grid; gap: .6rem; max-width: 33rem; }
+.objectif .etiquette { font: 500 .78rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.objectif h3 { font-size: clamp(1.45rem, 1.05rem + 1.6vw, 2.25rem); line-height: 1.1; letter-spacing: -0.02em; }
+.objectif p { color: var(--encre-douce); font-size: 1.1rem; }
+
+.objectifs.anime { height: 520vh; }
+.objectifs.anime .objectifs-scene { position: sticky; top: 4.25rem; height: calc(100svh - 4.25rem); padding: 0; display: grid; align-items: center; overflow: hidden; }
+.objectifs.anime .objectifs3d { display: block; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.objectifs.anime .enveloppe { position: relative; width: 100%; }
+.objectifs.anime .objectifs-liste { grid-template-areas: "pile"; gap: 0; }
+.objectifs.anime .objectif { grid-area: pile; opacity: 0; transform: translateY(28px); filter: blur(8px); pointer-events: none;
+  transition: opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1), filter .6s ease; }
+.objectifs.anime .objectif.actif { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.objectifs.anime .objectifs-rail { display: flex; position: absolute; left: 50%; bottom: clamp(1rem, 3vh, 2rem); transform: translateX(-50%); gap: .35rem;
+  padding: .35rem; border: 1px solid var(--trait); border-radius: 999px; background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(8px); }
+.objectifs-rail button { display: flex; align-items: center; gap: .45rem; border: 0; background: none; cursor: pointer; padding: .5rem .8rem; border-radius: 999px;
+  font: 500 .75rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--encre-douce); transition: background-color .3s, color .3s; }
+.objectifs-rail button::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; border: 1.5px solid currentColor; transition: background-color .3s; }
+.objectifs-rail button.actif { background: var(--accent-doux); color: var(--accent); }
+.objectifs-rail button.actif::before, .objectifs-rail button.fait::before { background: currentColor; }
+@media (max-width: 860px) {
+  .objectifs.anime .objectifs-scene { align-items: end; padding-bottom: 5.5rem; }
+  .objectifs.anime .objectifs-texte h2 { font-size: 1.3rem; }
+  .objectifs-rail button:not(.actif) span { display: none; }
+}
+
+/* Particules au premier plan, par-dessus le contenu mais sous l'en-tête */
+.premier-plan { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 9; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<a class="evitement" href="#haut">Aller au contenu</a>
+<header class="barre">
+  <div class="enveloppe">
+    <a class="marque" href="#haut" aria-label="Juan Fajardo, retour en haut">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 27 7.5v8.2c0 6.6-4.6 11.4-11 13.3C9.6 27.1 5 22.3 5 15.7V7.5z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M11 16h10" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>Juan Fajardo<small>Réseaux · Cloud · Cybersécurité</small></span>
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#domaines">Domaines</a>
+      <a href="#labs">Labs</a>
+      <a href="#parcours">Parcours</a>
+      <a href="#questions">Questions</a>
+      <button class="bascule-theme" id="bascule-theme" type="button" aria-label="Changer de thème">
+        <svg class="icone-lune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
+        <svg class="icone-soleil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>
+      </button>
+      <a class="bouton bouton-plein" href="#contact">Me contacter</a>
+    </nav>
+  </div>
+</header>
+
+<main id="haut">
+  <section class="accroche">
+    <canvas class="reseau3d" id="reseau3d" aria-hidden="true"></canvas>
+    <div class="enveloppe">
+      <div>
+        <span class="surtitre">Bachelor Réseaux, Cloud &amp; Cybersécurité · Toulouse</span>
+        <h1>Je monte des infrastructures, <em>puis</em> je les sécurise.</h1>
+        <p class="chapeau">Étudiant à IGENSIA Tech, je construis mes propres labs : Active Directory, réseaux segmentés, pare-feu, serveurs Linux. Je cherche un stage pour mettre tout ça en pratique dans une vraie équipe.</p>
+        <div class="actions">
+          <a class="bouton bouton-plein" href="#contact">Me proposer un stage</a>
+          <a class="bouton bouton-contour" href="#labs">Voir mes labs</a>
+        </div>
+        <ul class="preuves">
+          <li>Stage de 2 à 6 mois</li>
+          <li>Disponible dès février 2027</li>
+          <li>Toulouse et alentours · permis B</li>
+        </ul>
+      </div>
+
+      <article class="rapport" aria-label="Fiche de présentation">
+        <div class="rapport-tete">
+          <b>Fiche · Recherche de stage</b>
+          <span>maramewe@toulouse:~$ cat profil.txt</span>
+        </div>
+        <div class="compte" role="list">
+          <div class="c-accent" role="listitem"><strong>2–6</strong><small>Mois de stage</small></div>
+          <div class="c-bas" role="listitem"><strong>02/27</strong><small>Début</small></div>
+          <div class="c-accent" role="listitem"><strong>3</strong><small>Formations</small></div>
+          <div class="c-bas" role="listitem"><strong>B1–B2</strong><small>Anglais</small></div>
+        </div>
+        <ul class="constats balayage">
+          <li class="constat"><span class="id">LAB-01</span><p>Active Directory, DNS et DHCP<small>Windows Server 2022 sous VMware</small></p><span class="score s-bas">Windows</span></li>
+          <li class="constat"><span class="id">LAB-02</span><p>NAT et accès VPN SSTP<small>Services réseau Windows</small></p><span class="score s-bas">Réseau</span></li>
+          <li class="constat"><span class="id">LAB-03</span><p>Routage, DHCP et DNS BIND9<small>Zones directe et inverse sous Debian</small></p><span class="score s-moyen">Linux</span></li>
+          <li class="constat"><span class="id">LAB-04</span><p>Réseau segmenté en VLAN<small>Filtrage par un pare-feu OPNsense</small></p><span class="score s-haut">Sécurité</span></li>
+          <li class="constat"><span class="id">LAB-05</span><p>Challenges d’entraînement offensif<small>Root-Me et TryHackMe</small></p><span class="score s-crit">Offensif</span></li>
+        </ul>
+        <div class="rapport-pied"><span>Labs réalisés en formation</span><span>Détail plus bas</span></div>
+      </article>
+    </div>
+  </section>
+
+  <div class="referentiels" aria-label="Outils utilisés">
+    <div class="enveloppe">
+      <span>Outils que j’utilise</span>
+      <ul>
+        <li>Windows Server</li>
+        <li>Debian</li>
+        <li>OPNsense</li>
+        <li>VMware</li>
+        <li>Wireshark</li>
+        <li>GNS3</li>
+        <li>Packet Tracer</li>
+        <li>Bash · Python · Git</li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="objectifs" id="domaines" aria-labelledby="objectifs-titre">
+    <div class="objectifs-scene">
+      <canvas class="objectifs3d" id="objectifs3d" aria-hidden="true"></canvas>
+      <div class="enveloppe">
+        <div class="objectifs-texte">
+          <span class="surtitre">Domaines</span>
+          <h2 id="objectifs-titre">Cinq domaines, un même objectif : des systèmes qui tiennent.</h2>
+          <ol class="objectifs-liste">
+            <li class="objectif"><span class="etiquette">01 · Administrer</span><h3>Administration systèmes</h3><p>Windows Server et Active Directory, serveurs Linux Debian, services DNS et DHCP.</p></li>
+            <li class="objectif"><span class="etiquette">02 · Connecter</span><h3>Réseaux</h3><p>Adressage IP, routage, VLAN, NAT et VPN, maquettés sous Packet Tracer, GNS3 et VMware.</p></li>
+            <li class="objectif"><span class="etiquette">03 · Protéger</span><h3>Sécurité défensive</h3><p>Pare-feu OPNsense, durcissement, détection et réponse à incident.</p></li>
+            <li class="objectif"><span class="etiquette">04 · Tester</span><h3>Sécurité offensive</h3><p>Reconnaissance et pentest web (OWASP Top 10), uniquement sur des plateformes et des labs autorisés.</p></li>
+            <li class="objectif"><span class="etiquette">05 · Automatiser</span><h3>Scripts et automatisation</h3><p>Bash, Python et Git pour gagner du temps sur les tâches d’administration.</p></li>
+          </ol>
+        </div>
+      </div>
+      <div class="objectifs-rail" aria-label="Aller à un domaine">
+        <button type="button" data-objectif="0"><span>Administrer</span></button>
+        <button type="button" data-objectif="1"><span>Connecter</span></button>
+        <button type="button" data-objectif="2"><span>Protéger</span></button>
+        <button type="button" data-objectif="3"><span>Tester</span></button>
+        <button type="button" data-objectif="4"><span>Automatiser</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="labs">
+    <div class="enveloppe">
+      <div class="entete-section">
+        <span class="surtitre">Labs</span>
+        <h2>Ce que j’ai déjà mis en pratique.</h2>
+        <p>Chaque lab est monté de zéro dans des machines virtuelles, puis testé. Les projets et scripts sont publiés au fur et à mesure sur mon GitHub.</p>
+      </div>
+      <div class="services">
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+          <h3>Annuaire Windows</h3>
+          <p>Un domaine Active Directory complet sous Windows Server 2022, avec ses services réseau.</p>
+          <ul><li>Active Directory</li><li>DNS et DHCP</li><li>Virtualisé sous VMware</li></ul>
+        </article>
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+          <h3>Accès distant</h3>
+          <p>Partage de connexion et accès des utilisateurs nomades au réseau de l’entreprise.</p>
+          <ul><li>NAT</li><li>VPN SSTP</li><li>Services réseau Windows</li></ul>
+        </article>
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg>
+          <h3>Services Linux</h3>
+          <p>Un serveur Debian qui route le trafic et fournit les adresses et la résolution de noms.</p>
+          <ul><li>Routage</li><li>DHCP</li><li>DNS BIND9, zones directe et inverse</li></ul>
+        </article>
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 6v6c0 5-3.4 8.3-8 9.5C7.4 20.3 4 17 4 12V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          <h3>Réseau segmenté</h3>
+          <p>Un réseau découpé en VLAN, dont les échanges sont filtrés par un pare-feu.</p>
+          <ul><li>VLAN</li><li>Pare-feu OPNsense</li><li>Règles de filtrage</li></ul>
+        </article>
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          <h3>Entraînement offensif</h3>
+          <p>Des challenges pour comprendre comment on attaque, et donc mieux défendre.</p>
+          <ul><li>Root-Me</li><li>TryHackMe</li><li>Pentest web, OWASP Top 10</li></ul>
+        </article>
+        <article class="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg>
+          <h3>Projets et scripts</h3>
+          <p>Mes outils et mes scripts d’administration, publiés et documentés sur GitHub.</p>
+          <ul><li>Bash et Python</li><li>Versionnés avec Git</li><li><a href="https://github.com/Maramewe">github.com/Maramewe</a></li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="methode" id="parcours">
+    <canvas class="terrain3d" id="terrain3d" aria-hidden="true"></canvas>
+    <div class="enveloppe">
+      <div class="entete-section">
+        <span class="surtitre">Parcours</span>
+        <h2>Des bootcamps au Bachelor.</h2>
+        <p>Deux formations intensives en cybersécurité, puis un Bachelor pour consolider les réseaux et les systèmes.</p>
+      </div>
+      <ol class="etapes">
+        <li><h3>Cybersecurity Essentials</h3><p>Jedha. Bootcamp d’introduction : sécurité des systèmes, sécurité réseau, pentest web.</p><span class="duree">Mars à avril 2026</span></li>
+        <li><h3>Cybersécurité Full Stack</h3><p>Jedha. Bases Linux, Windows et réseaux, offensive (OWASP Top 10) et défense (durcissement, détection, forensic).</p><span class="duree">Avril à août 2026</span></li>
+        <li><h3>Bachelor Réseaux, Cloud &amp; Cybersécurité</h3><p>IGENSIA Tech, Toulouse. Administration Unix/Linux, adressage IP, services réseau Windows Server, anglais technique.</p><span class="duree">Depuis septembre 2026</span></li>
+        <li><h3>Stage</h3><p>Mettre en pratique en entreprise ce que j’ai appris en lab, au sein d’une équipe systèmes, réseaux ou sécurité.</p><span class="duree">À partir de février 2027</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="enveloppe">
+      <div class="entete-section">
+        <span class="surtitre">Ma façon de travailler</span>
+        <h2>Un cadre clair, surtout côté offensif.</h2>
+      </div>
+      <div class="engagements">
+        <div><span class="loi">Code pénal, art. 323-1</span><h3>Jamais sans autorisation</h3><p>Je ne teste que mes propres labs et des plateformes prévues pour ça, comme Root-Me et TryHackMe.</p></div>
+        <div><span class="loi">Labs isolés</span><h3>Tout se passe en virtuel</h3><p>Mes maquettes tournent dans des machines virtuelles, sur mon propre matériel.</p></div>
+        <div><span class="loi">Documentation</span><h3>J’écris ce que je fais</h3><p>Je prends des notes sur chaque lab, pour pouvoir le refaire et l’expliquer.</p></div>
+        <div><span class="loi">Curiosité</span><h3>J’apprends tous les jours</h3><p>Linux, Bash, Python, réseaux et Git : un programme régulier, en plus des cours.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="questions" style="padding-top:0">
+    <div class="enveloppe questions">
+      <div class="entete-section">
+        <span class="surtitre">Questions fréquentes</span>
+        <h2>Ce qu’un recruteur me demande souvent.</h2>
+      </div>
+      <div>
+        <details><summary>Quand et pour combien de temps êtes-vous disponible ?</summary><p>À partir de février 2027, pour un stage de 2 à 6 mois.</p></details>
+        <details><summary>Où pouvez-vous travailler ?</summary><p>À Toulouse et dans ses alentours. J’ai le permis B.</p></details>
+        <details><summary>Quels types de postes vous intéressent ?</summary><p>Administration systèmes et réseaux, sécurité défensive (SOC, durcissement) ou sécurité offensive. Je cherche surtout une équipe où apprendre au contact de professionnels.</p></details>
+        <details><summary>Quel est votre niveau d’anglais ?</summary><p>Niveau B1 à B2 : je lis sans difficulté la documentation technique, et je travaille l’oral régulièrement.</p></details>
+        <details><summary>Où voir votre travail ?</summary><p>Sur <a href="https://github.com/Maramewe">mon GitHub</a>, où je publie mes projets, mes scripts et mes labs.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="enveloppe">
+      <div class="intro">
+        <span class="surtitre">Contact</span>
+        <h2>Parlons de votre équipe.</h2>
+        <p>Vous avez un stage à proposer, ou simplement une question sur mon parcours ? Écrivez-moi, je réponds rapidement.</p>
+        <ul class="coordonnees">
+          <li><small>E-mail</small><span class="valeur"><span id="c-email"></span><button class="copier" type="button" data-copie="c-email">Copier</button></span></li>
+          <li><small>LinkedIn</small><span class="valeur"><a id="c-linkedin" href=""></a></span></li>
+          <li><small>GitHub</small><span class="valeur"><a id="c-github" href=""></a></span></li>
+          <li><small>Zone</small><span class="valeur" id="c-zone"></span></li>
+        </ul>
+      </div>
+      <form class="formulaire" id="form-contact" novalidate>
+        <div class="deux">
+          <div class="champ"><label for="f-nom">Nom</label><input id="f-nom" name="nom" autocomplete="name" required></div>
+          <div class="champ"><label for="f-societe">Entreprise</label><input id="f-societe" name="societe" autocomplete="organization" required></div>
+        </div>
+        <div class="champ"><label for="f-email">E-mail professionnel</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="champ"><label for="f-besoin">Objet</label>
+          <select id="f-besoin" name="besoin">
+            <option>Proposition de stage</option>
+            <option>Question sur mon parcours</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="champ"><label for="f-message">Votre message</label><textarea id="f-message" name="message" placeholder="Poste, équipe, dates, lieu…"></textarea></div>
+        <label class="case"><input type="checkbox" id="f-accord" required><span>J’accepte que ces informations servent uniquement à répondre à mon message.</span></label>
+        <button class="bouton bouton-plein" type="submit">Envoyer mon message</button>
+        <p class="message" id="f-retour" hidden></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <div class="enveloppe">
+    <span>© <span id="annee"></span> <span id="p-nom"></span> · Étudiant en cybersécurité</span>
+    <nav aria-label="Informations légales"><a href="mentions-legales.html">Mentions légales</a><a href="confidentialite.html">Confidentialité</a><a href="#haut">Retour en haut</a></nav>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+// === À PERSONNALISER ===
+const CONFIG = {
+  nom: "Juan Fajardo",
+  email: "juan31fajardo@gmail.com",
+  linkedin: "https://www.linkedin.com/in/juan-fajardo-cyber",
+  github: "https://github.com/Maramewe",
+  zone: "Toulouse et alentours",
+  domaine: "juan-fajardo.pages.dev", // adresse du site en ligne
+};
+// === FIN DE LA PARTIE À PERSONNALISER ===
+
+const $ = (id) => document.getElementById(id);
+const sansProtocole = (url) => url.replace(/^https:\/\/(www\.)?/, "");
+
+// Coordonnées et pied de page
+$("c-email").textContent = CONFIG.email;
+$("c-linkedin").href = CONFIG.linkedin;
+$("c-linkedin").textContent = sansProtocole(CONFIG.linkedin);
+$("c-github").href = CONFIG.github;
+$("c-github").textContent = sansProtocole(CONFIG.github);
+$("c-zone").textContent = CONFIG.zone;
+$("p-nom").textContent = CONFIG.nom;
+$("annee").textContent = new Date().getFullYear();
+
+// Copie des coordonnées
+document.querySelectorAll(".copier").forEach((b) => {
+  b.addEventListener("click", async () => {
+    const cible = $(b.dataset.copie);
+    try {
+      await navigator.clipboard.writeText(cible.textContent);
+      b.textContent = "Copié";
+    } catch {
+      const r = document.createRange(); r.selectNodeContents(cible);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = "Sélectionné";
+    }
+    setTimeout(() => (b.textContent = "Copier"), 1800);
+  });
+});
+
+// Formulaire de contact : la demande part par la messagerie du visiteur (mailto), sans service tiers ni stockage
+$("form-contact").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const retour = $("f-retour");
+  const manquant = ["f-nom", "f-societe", "f-email"].find((id) => !$(id).value.trim());
+  retour.hidden = false;
+  if (manquant) {
+    retour.className = "message erreur";
+    retour.textContent = `Renseignez le champ « ${document.querySelector(`label[for="${manquant}"]`).textContent} » pour continuer.`;
+    $(manquant).focus();
+  } else if (!$("f-email").checkValidity()) {
+    retour.className = "message erreur";
+    retour.textContent = "L’adresse e-mail semble incomplète. Vérifiez-la, par exemple nom@entreprise.fr.";
+    $("f-email").focus();
+  } else if (!$("f-accord").checked) {
+    retour.className = "message erreur";
+    retour.textContent = "Cochez la case d’accord pour que je puisse vous répondre.";
+  } else {
+    const champ = (id) => $(id).value.trim();
+    const corps = [
+      `Nom : ${champ("f-nom")}`,
+      `Entreprise : ${champ("f-societe")}`,
+      `E-mail : ${champ("f-email")}`,
+      `Objet : ${$("f-besoin").selectedOptions[0].textContent}`,
+      "",
+      champ("f-message"),
+    ].join("\n");
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(`${$("f-besoin").selectedOptions[0].textContent} – ${champ("f-societe")}`)}&body=${encodeURIComponent(corps)}`;
+    retour.className = "message";
+    retour.textContent = `Merci ${champ("f-nom")}. Votre messagerie s’ouvre avec le message prêt à envoyer. Si rien ne s’ouvre, écrivez-moi directement à ${CONFIG.email}.`;
+  }
+});
+
+// Bascule clair / sombre, mémorisée pour les visites suivantes
+function basculeTheme() {
+  const bouton = $("bascule-theme");
+  if (!bouton) return;
+  const sombre = () => {
+    const t = document.documentElement.dataset.theme;
+    return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  };
+  const libelle = () => bouton.setAttribute("aria-label", sombre() ? "Passer en thème clair" : "Passer en thème sombre");
+  bouton.addEventListener("click", () => {
+    const theme = sombre() ? "light" : "dark";
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem("theme", theme); } catch {}
+    libelle();
+  });
+  libelle();
+  surChangementTheme(libelle);
+}
+basculeTheme();
+
+// ===== Animations et 3D =====
+// Sans WebGL ni Three.js, les canevas restent vides et la page fonctionne normalement.
+// Avec prefers-reduced-motion, chaque scène n'affiche qu'une image fixe.
+
+// Titre de l'accroche découpé en mots, pour les faire monter un à un à l'arrivée
+function decouperTitre() {
+  const titre = document.querySelector(".accroche h1");
+  if (!titre) return;
+  titre.setAttribute("aria-label", titre.textContent.trim().replace(/\s+/g, " "));
+  let rang = 0;
+  const decouper = (noeud) => {
+    [...noeud.childNodes].forEach((enfant) => {
+      if (enfant.nodeType !== Node.TEXT_NODE) return decouper(enfant);
+      const fragment = document.createDocumentFragment();
+      enfant.textContent.split(/(\s+)/).forEach((morceau) => {
+        if (!morceau) return;
+        if (/^\s+$/.test(morceau)) return fragment.append(morceau);
+        const mot = document.createElement("span");
+        const interieur = document.createElement("span");
+        mot.className = "mot";
+        mot.setAttribute("aria-hidden", "true");
+        interieur.textContent = morceau;
+        interieur.style.setProperty("--i", rang++);
+        mot.append(interieur);
+        fragment.append(mot);
+      });
+      enfant.replaceWith(fragment);
+    });
+  };
+  decouper(titre);
+}
+decouperTitre();
+
+// Blocs qui apparaissent en glissant quand on les atteint en défilant
+function reveler() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+  const blocs = document.querySelectorAll(".entete-section, .service, .etapes li, .offre, .engagements > *, .contenu-rapport li, .fiche");
+  const observateur = new IntersectionObserver((entrees) => {
+    entrees.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("revele");
+      observateur.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  blocs.forEach((bloc) => {
+    const rang = [...bloc.parentElement.children].indexOf(bloc) % 3;
+    bloc.style.setProperty("--delai", `${rang * 90}ms`);
+    bloc.classList.add("a-reveler");
+    observateur.observe(bloc);
+  });
+}
+reveler();
+
+// Effets à la souris : lueur sur les cartes, fiche de rapport inclinable, boutons aimantés
+function effetsSouris() {
+  if (!matchMedia("(hover: hover) and (pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".service, .offre, .fiche, .rapport").forEach((carte) => {
+    carte.classList.add("lueur");
+    carte.addEventListener("pointermove", (e) => {
+      const r = carte.getBoundingClientRect();
+      carte.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      carte.style.setProperty("--my", `${e.clientY - r.top}px`);
+    });
+    carte.addEventListener("pointerleave", () => {
+      carte.style.removeProperty("--mx");
+      carte.style.removeProperty("--my");
+    });
+  });
+
+  const fiche = document.querySelector(".accroche .rapport");
+  if (fiche) {
+    fiche.classList.add("inclinable");
+    fiche.addEventListener("pointermove", (e) => {
+      const r = fiche.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      fiche.style.transform = `perspective(1000px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg)`;
+    });
+    fiche.addEventListener("pointerleave", () => (fiche.style.transform = ""));
+  }
+
+  document.querySelectorAll(".accroche .actions .bouton").forEach((bouton) => {
+    bouton.addEventListener("pointermove", (e) => {
+      const r = bouton.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) * 0.18, y = (e.clientY - r.top - r.height / 2) * 0.3;
+      bouton.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    });
+    bouton.addEventListener("pointerleave", () => (bouton.style.transform = ""));
+  });
+}
+effetsSouris();
+
+function creerRendu(canevas) {
+  if (!canevas || typeof THREE === "undefined") return null;
+  try {
+    const rendu = new THREE.WebGLRenderer({ canvas: canevas, alpha: true, antialias: true });
+    rendu.setClearColor(0x000000, 0);
+    return rendu;
+  } catch {
+    return null;
+  }
+}
+
+// Fait tourner une scène : taille suivie, pause hors écran, une image fixe si mouvement réduit
+function boucle3d({ canevas, zone, rendu, scene, camera, etape, redimensionner }) {
+  const reduit = matchMedia("(prefers-reduced-motion: reduce)");
+  let id = 0, visible = false, avant = 0;
+  const dessiner = () => rendu.render(scene, camera);
+  function image(t) {
+    const dt = avant ? Math.min((t - avant) / 1000, 0.05) : 1 / 60;
+    avant = t;
+    etape(dt);
+    dessiner();
+    id = requestAnimationFrame(image);
+  }
+  const demarrer = () => {
+    if (id || !visible || reduit.matches) return;
+    avant = 0;
+    id = requestAnimationFrame(image);
+  };
+  const arreter = () => {
+    cancelAnimationFrame(id);
+    id = 0;
+  };
+  const rafraichir = () => {
+    if (id) return;
+    etape(0);
+    dessiner();
+  };
+
+  new ResizeObserver(() => {
+    const l = canevas.clientWidth, h = canevas.clientHeight;
+    if (!l || !h) return;
+    const densite = Math.min(devicePixelRatio, 2);
+    rendu.setPixelRatio(densite);
+    rendu.setSize(l, h, false);
+    camera.aspect = l / h;
+    camera.updateProjectionMatrix();
+    redimensionner?.(h * densite / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))));
+    rafraichir();
+  }).observe(canevas);
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    visible ? demarrer() : arreter();
+  }).observe(zone);
+  reduit.addEventListener("change", () => (reduit.matches ? arreter() : demarrer()));
+  return { rafraichir, reduit };
+}
+
+function lireTheme() {
+  const style = getComputedStyle(document.documentElement);
+  const couleur = (nom, defaut) => new THREE.Color(style.getPropertyValue(nom).trim() || defaut);
+  const fond = couleur("--fond", "#f3f5f9");
+  return {
+    accent: couleur("--accent", "#2348c9"),
+    bas: couleur("--bas", "#2f7d55"),
+    crit: couleur("--crit", "#b4232a"),
+    sombre: fond.r * 0.3 + fond.g * 0.59 + fond.b * 0.11 < 0.5,
+  };
+}
+function surChangementTheme(rappel) {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rappel);
+  new MutationObserver(rappel).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+// Points ronds et lumineux ; taille en unités de la scène, teinte 0 = accent, 1 = vert, 2 = rouge
+const SHADER_POINTS = {
+  vertexShader: `
+    attribute float aTaille; attribute float aAlpha; attribute float aTeinte;
+    uniform float uEchelle; uniform float uTemps; uniform float uScintille;
+    varying float vAlpha; varying float vTeinte;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = aTaille * uEchelle / -mv.z;
+      gl_Position = projectionMatrix * mv;
+      float s = 1.0 - uScintille * 0.6 * (0.5 + 0.5 * sin(uTemps * 2.3 + position.x * 13.0 + position.y * 7.0));
+      vAlpha = aAlpha * s;
+      vTeinte = aTeinte;
+    }`,
+  fragmentShader: `
+    uniform vec3 uAccent; uniform vec3 uBas; uniform vec3 uCrit;
+    varying float vAlpha; varying float vTeinte;
+    void main() {
+      float d = length(gl_PointCoord - 0.5);
+      float a = smoothstep(0.5, 0.0, d);
+      a = a * a + smoothstep(0.16, 0.0, d) * 0.6;
+      vec3 c = vTeinte < 1.0 ? mix(uAccent, uBas, vTeinte) : mix(uBas, uCrit, vTeinte - 1.0);
+      if (a * vAlpha < 0.01) discard;
+      gl_FragColor = vec4(c, a * vAlpha);
+    }`,
+};
+
+function nuagePoints(n, uniformes, scintille = 0) {
+  const geo = new THREE.BufferGeometry();
+  const attribut = (nom, taille) => {
+    const a = new THREE.BufferAttribute(new Float32Array(n * taille), taille);
+    a.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute(nom, a);
+    return a.array;
+  };
+  const nuage = {
+    pos: attribut("position", 3), taille: attribut("aTaille", 1), alpha: attribut("aAlpha", 1), teinte: attribut("aTeinte", 1),
+    matiere: new THREE.ShaderMaterial({
+      ...SHADER_POINTS, uniforms: { ...uniformes, uScintille: { value: scintille } }, transparent: true, depthWrite: false,
+    }),
+    maj: () => Object.values(geo.attributes).forEach((a) => (a.needsUpdate = true)),
+  };
+  nuage.objet = new THREE.Points(geo, nuage.matiere);
+  nuage.objet.frustumCulled = false;
+  return nuage;
+}
+
+const entre = (x, a, b) => Math.min(1, Math.max(0, (x - a) / (b - a)));
+const sortieCubique = (t) => 1 - (1 - t) ** 3;
+const sortieRessort = (t) => 1 + 2.2 * (t - 1) ** 3 + 1.2 * (t - 1) ** 2;
+function directionAuHasard(v = new THREE.Vector3()) {
+  const y = Math.random() * 2 - 1, phi = Math.random() * Math.PI * 2, r = Math.sqrt(1 - y * y);
+  return v.set(Math.cos(phi) * r, y, Math.sin(phi) * r);
+}
+
+// Accroche : un réseau protégé par un bouclier. Des attaques arrivent de l'extérieur
+// et sont bloquées par la bulle ; la souris vise et fait réagir les nœuds, un clic tire.
+function reseau3d() {
+  const canevas = $("reseau3d");
+  const rendu = creerRendu(canevas);
+  if (!rendu) return;
+  const zone = canevas.closest(".accroche") || canevas;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+  const monde = new THREE.Group();       // suit le défilement
+  const inclinaison = new THREE.Group(); // suit la souris
+  const sphere = new THREE.Group();      // tourne lentement
+  monde.add(inclinaison);
+  inclinaison.add(sphere);
+  scene.add(monde);
+
+  const uniformes = {
+    uAccent: { value: new THREE.Color() }, uBas: { value: new THREE.Color() }, uCrit: { value: new THREE.Color() },
+    uEchelle: { value: 600 }, uTemps: { value: 0 },
+  };
+  const AXE_Z = new THREE.Vector3(0, 0, 1);
+  const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+
+  // Nœuds en spirale de Fibonacci ; à l'arrivée ils partent de loin et se rassemblent
+  const N = 220, RAYON_BULLE = 1.22;
+  const base = [], depart = [], courant = [], retard = new Float32Array(N), eclat = new Float32Array(N);
+  const angleOr = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (2 * (i + 0.5)) / N, r = Math.sqrt(1 - y * y);
+    base.push(new THREE.Vector3(Math.cos(i * angleOr) * r, y, Math.sin(i * angleOr) * r));
+    depart.push(directionAuHasard().multiplyScalar(4 + Math.random() * 5));
+    courant.push(new THREE.Vector3());
+    retard[i] = (1 - y) * 0.25 + Math.random() * 0.25;
+  }
+  const noeuds = nuagePoints(N, uniformes);
+  sphere.add(noeuds.objet);
+
+  // Liens vers les 3 plus proches voisins, sans doublon
+  const voisins = base.map(() => []);
+  const cles = new Set();
+  base.forEach((p, i) => {
+    base.map((q, j) => [j, p.distanceToSquared(q)]).filter(([j]) => j !== i)
+      .sort((a, b) => a[1] - b[1]).slice(0, 3)
+      .forEach(([j]) => cles.add(i < j ? `${i}-${j}` : `${j}-${i}`));
+  });
+  const paires = [...cles].map((c) => c.split("-").map(Number));
+  paires.forEach(([a, b]) => { voisins[a].push(b); voisins[b].push(a); });
+  const geoLiens = new THREE.BufferGeometry();
+  const posLiens = new Float32Array(paires.length * 6), eclatLiens = new Float32Array(paires.length * 2);
+  geoLiens.setAttribute("position", new THREE.BufferAttribute(posLiens, 3).setUsage(THREE.DynamicDrawUsage));
+  geoLiens.setAttribute("aEclat", new THREE.BufferAttribute(eclatLiens, 1).setUsage(THREE.DynamicDrawUsage));
+  const matiereLiens = new THREE.ShaderMaterial({
+    uniforms: { uAccent: uniformes.uAccent, uBas: uniformes.uBas, uOpacite: { value: 0 } },
+    vertexShader: `attribute float aEclat; varying float vE;
+      void main() { vE = aEclat; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform vec3 uAccent; uniform vec3 uBas; uniform float uOpacite; varying float vE;
+      void main() { gl_FragColor = vec4(mix(uAccent, uBas, clamp(vE, 0.0, 1.0)), uOpacite * (1.0 + vE * 3.0)); }`,
+    transparent: true, depthWrite: false,
+  });
+  const liens = new THREE.LineSegments(geoLiens, matiereLiens);
+  liens.frustumCulled = false;
+  sphere.add(liens);
+
+  // Impulsions qui glissent de nœud en nœud
+  const impulsions = Array.from({ length: 70 }, () => {
+    const a = Math.floor(Math.random() * N);
+    return { a, b: voisins[a][Math.floor(Math.random() * voisins[a].length)], t: Math.random(), v: 0.4 + Math.random() * 0.6 };
+  });
+  const nuageImpulsions = nuagePoints(impulsions.length, uniformes);
+  impulsions.forEach((_, i) => { nuageImpulsions.taille[i] = 0.075; nuageImpulsions.teinte[i] = 1; });
+  sphere.add(nuageImpulsions.objet);
+
+  // Bulle géodésique : le pare-feu, qui s'illumine quand il bloque une attaque
+  const matiereBulle = new THREE.LineBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+  sphere.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(RAYON_BULLE, 2)), matiereBulle));
+  let flashBulle = 0;
+
+  // Bouclier du logo en 3D, au cœur du réseau
+  const forme = new THREE.Shape();
+  const P = (x, y) => [(x - 16) / 13, (16 - y) / 13]; // repère 32 × 32 du logo, recentré
+  forme.moveTo(...P(16, 3));
+  forme.lineTo(...P(27, 7.5));
+  forme.lineTo(...P(27, 15.7));
+  forme.bezierCurveTo(...P(27, 22.3), ...P(22.4, 27.1), ...P(16, 29));
+  forme.bezierCurveTo(...P(9.6, 27.1), ...P(5, 22.3), ...P(5, 15.7));
+  forme.lineTo(...P(5, 7.5));
+  forme.closePath();
+  const geoBouclier = new THREE.ExtrudeGeometry(forme, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.05, bevelSegments: 3, curveSegments: 28 });
+  geoBouclier.center();
+  const matiereFace = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.12, depthWrite: false });
+  const matiereAretes = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.9 });
+  const matiereBarre = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.75 });
+  const bouclier = new THREE.Group();
+  bouclier.add(new THREE.Mesh(geoBouclier, matiereFace));
+  bouclier.add(new THREE.LineSegments(new THREE.EdgesGeometry(geoBouclier, 25), matiereAretes));
+  bouclier.add(new THREE.Mesh(new THREE.BoxGeometry(0.77, 0.21, 0.42), matiereBarre));
+  const halo = nuagePoints(1, uniformes);
+  halo.taille[0] = 0.9; halo.alpha[0] = 0.35; halo.teinte[0] = 0.6;
+  bouclier.add(halo.objet);
+  inclinaison.add(bouclier);
+
+  // Orbites en pointillés, chacune avec deux satellites
+  const orbites = [
+    { r: 1.45, rx: 1.15, rz: 0.3, v: 0.5 },
+    { r: 1.62, rx: -0.85, rz: 1.1, v: -0.33 },
+    { r: 1.82, rx: 0.25, rz: -0.65, v: 0.22 },
+  ].map((o) => {
+    const pts = Array.from({ length: 161 }, (_, i) => {
+      const a = (i / 160) * Math.PI * 2;
+      return new THREE.Vector3(Math.cos(a) * o.r, 0, Math.sin(a) * o.r);
+    });
+    const ligne = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineDashedMaterial({ dashSize: 0.05, gapSize: 0.07, transparent: true, opacity: 0.4, depthWrite: false }));
+    ligne.computeLineDistances();
+    const satellites = nuagePoints(2, uniformes);
+    [0, 1].forEach((k) => {
+      tmp.set(Math.cos(k * Math.PI) * o.r, 0, Math.sin(k * Math.PI) * o.r).toArray(satellites.pos, k * 3);
+      satellites.taille[k] = 0.11; satellites.alpha[k] = 1; satellites.teinte[k] = k * 0.8;
+    });
+    const tour = new THREE.Group();
+    tour.add(ligne, satellites.objet);
+    const pivot = new THREE.Group();
+    pivot.rotation.set(o.rx, 0, o.rz);
+    pivot.add(tour);
+    inclinaison.add(pivot);
+    return { ...o, ligne, pivot, tour };
+  });
+
+  // Étincelles : traînées des attaques et éclats des impacts
+  const MAX = 1200;
+  const etincelles = nuagePoints(MAX, uniformes);
+  const vitesse = new Float32Array(MAX * 3), vie = new Float32Array(MAX), vieMax = new Float32Array(MAX).fill(1), taille0 = new Float32Array(MAX);
+  let suivante = 0;
+  sphere.add(etincelles.objet);
+  function emettre(p, v, duree, taille, teinte) {
+    const i = suivante;
+    suivante = (suivante + 1) % MAX;
+    p.toArray(etincelles.pos, i * 3);
+    v.toArray(vitesse, i * 3);
+    vie[i] = vieMax[i] = duree;
+    taille0[i] = taille;
+    etincelles.teinte[i] = teinte;
+  }
+  function majEtincelles(dt) {
+    const frein = Math.exp(-2 * dt);
+    for (let i = 0; i < MAX; i++) {
+      if (vie[i] <= 0) { etincelles.alpha[i] = 0; continue; }
+      vie[i] -= dt;
+      const k = Math.max(0, vie[i] / vieMax[i]);
+      for (let c = 0; c < 3; c++) {
+        etincelles.pos[i * 3 + c] += vitesse[i * 3 + c] * dt;
+        vitesse[i * 3 + c] *= frein;
+      }
+      etincelles.alpha[i] = k;
+      etincelles.taille[i] = taille0[i] * (0.3 + 0.7 * k);
+    }
+    etincelles.maj();
+  }
+
+  // Ondes de choc posées sur la bulle
+  const matiereOnde = () => new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+  const geoOnde = new THREE.RingGeometry(0.93, 1, 64);
+  const ondes = Array.from({ length: 10 }, () => {
+    const m = new THREE.Mesh(geoOnde, matiereOnde());
+    m.visible = false;
+    sphere.add(m);
+    return { m, t: 1, taille: 0.4 };
+  });
+  function onde(point, taille) {
+    const o = ondes.find((x) => x.t >= 1) || ondes[0];
+    o.t = 0;
+    o.taille = taille;
+    o.m.visible = true;
+    o.m.position.copy(point);
+    o.m.quaternion.setFromUnitVectors(AXE_Z, tmp.copy(point).normalize());
+  }
+
+  // Impact bloqué par la bulle : onde, éclats verts, quelques débris rouges, nœuds qui s'allument
+  function impact(point, force = 1) {
+    const normale = tmp2.copy(point).normalize().clone();
+    onde(point, 0.32 * Math.sqrt(force));
+    if (force > 1) onde(point, 0.18 * force);
+    flashBulle = Math.min(1, flashBulle + 0.45 * force);
+    for (let k = 0; k < 26 * force; k++) {
+      const v = directionAuHasard().multiplyScalar(0.5 + Math.random() * 0.5).addScaledVector(normale, 0.5 + Math.random());
+      const rouge = Math.random() < 0.3;
+      emettre(point, v, 0.5 + Math.random() * 0.7, 0.04 + Math.random() * 0.05, rouge ? 2 : 1);
+    }
+    base.forEach((b, i) => {
+      const d = b.distanceTo(normale);
+      if (d < 0.5 * force) eclat[i] = Math.max(eclat[i], 1 - d / (0.5 * force));
+    });
+  }
+
+  // Attaques : un projectile rouge part de loin vers un nœud et s'écrase sur la bulle
+  const attaques = [];
+  let prochaineAttaque = 0.8;
+  function lancerAttaque() {
+    const cible = Math.floor(Math.random() * N);
+    const dir = directionAuHasard().multiplyScalar(0.7).add(base[cible]).normalize();
+    attaques.push({ depart: dir.multiplyScalar(3.6), arrivee: base[cible].clone().multiplyScalar(RAYON_BULLE), t: 0, v: 0.5 + Math.random() * 0.4, pos: new THREE.Vector3() });
+  }
+
+  // Poussière d'étoiles qui scintille et glisse en parallaxe
+  const poussiere = nuagePoints(1600, uniformes, 1);
+  for (let i = 0; i < 1600; i++) {
+    directionAuHasard(tmp).multiplyScalar(1.6 + Math.random() * 3.4).toArray(poussiere.pos, i * 3);
+    poussiere.taille[i] = 0.012 + Math.random() * 0.028;
+    poussiere.teinte[i] = Math.random() < 0.08 ? 1 : 0;
+  }
+  const groupePoussiere = new THREE.Group();
+  groupePoussiere.add(poussiere.objet);
+  scene.add(groupePoussiere);
+
+  // Viseur qui suit la souris à la surface du réseau
+  const matiereViseur = new THREE.LineBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+  const ptsViseur = [];
+  for (let i = 0; i < 48; i++) {
+    const a = (i / 48) * Math.PI * 2, b = ((i + 1) / 48) * Math.PI * 2;
+    if (i % 12 < 9) ptsViseur.push(new THREE.Vector3(Math.cos(a), Math.sin(a), 0), new THREE.Vector3(Math.cos(b), Math.sin(b), 0));
+  }
+  [0, 1, 2, 3].forEach((k) => {
+    const a = (k * Math.PI) / 2 + Math.PI / 4;
+    ptsViseur.push(new THREE.Vector3(Math.cos(a) * 1.25, Math.sin(a) * 1.25, 0), new THREE.Vector3(Math.cos(a) * 1.7, Math.sin(a) * 1.7, 0));
+  });
+  const viseur = new THREE.Group();
+  const croix = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ptsViseur), matiereViseur);
+  croix.scale.setScalar(0.11);
+  viseur.add(croix);
+  sphere.add(viseur);
+
+  // Souris
+  const souris = new THREE.Vector2(), cibleIncl = { x: 0, y: 0 };
+  let sourisDedans = false;
+  const rayon = new THREE.Raycaster(), boule = new THREE.Sphere(), touche = new THREE.Vector3();
+  let pointe = null;
+  addEventListener("pointermove", (e) => {
+    const r = canevas.getBoundingClientRect();
+    sourisDedans = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    souris.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    cibleIncl.x = (e.clientY / innerHeight - 0.5) * 0.4;
+    cibleIncl.y = (e.clientX / innerWidth - 0.5) * 0.6;
+  }, { passive: true });
+  zone.addEventListener("pointerleave", () => (sourisDedans = false));
+  zone.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("a, button, input, .rapport")) return;
+    if (pointe) impact(tmp.copy(pointe).normalize().multiplyScalar(RAYON_BULLE).clone(), 2.2);
+    else {
+      flashBulle = 1;
+      for (let k = 0; k < 4; k++) lancerAttaque();
+    }
+  });
+
+  // Couleurs du thème ; mélange additif (effet néon) seulement sur fond sombre
+  function couleurs() {
+    const theme = lireTheme();
+    uniformes.uAccent.value.copy(theme.accent);
+    uniformes.uBas.value.copy(theme.bas);
+    uniformes.uCrit.value.copy(theme.crit);
+    [matiereBulle, matiereFace, matiereAretes, matiereViseur, ...orbites.map((o) => o.ligne.material)].forEach((m) => m.color.copy(theme.accent));
+    matiereBarre.color.copy(theme.bas);
+    ondes.forEach((o) => o.m.material.color.copy(theme.bas));
+    const melange = theme.sombre ? THREE.AdditiveBlending : THREE.NormalBlending;
+    [noeuds, nuageImpulsions, etincelles, poussiere, halo].forEach((n) => { n.matiere.blending = melange; n.matiere.needsUpdate = true; });
+    matiereLiens.blending = melange;
+    matiereLiens.needsUpdate = true;
+  }
+
+  let temps = 0, demarre = false;
+  function etape(dt) {
+    temps += dt;
+    uniformes.uTemps.value = temps;
+    const arrivee = entre(temps, 0, 2.6);
+
+    // Arrivée de la caméra, puis recul quand on fait défiler la page
+    const r = zone.getBoundingClientRect();
+    const defile = entre(-r.top, 0, r.height || 1);
+    monde.scale.setScalar(Math.min(1, camera.aspect * 0.95));
+    camera.position.z = 4.9 + (1 - sortieCubique(arrivee)) * 3.5 - defile * 1.2;
+    monde.rotation.x = defile * 0.7;
+    const amorti = Math.min(1, dt * 2.5);
+    inclinaison.rotation.x += (cibleIncl.x - inclinaison.rotation.x) * amorti;
+    inclinaison.rotation.y += (cibleIncl.y - inclinaison.rotation.y) * amorti;
+    sphere.rotation.y += dt * (0.1 + (1 - arrivee) * 0.6);
+    groupePoussiere.rotation.y -= dt * 0.025;
+    groupePoussiere.position.x += (-cibleIncl.y * 0.6 - groupePoussiere.position.x) * amorti;
+    groupePoussiere.position.y += (cibleIncl.x * 0.5 - groupePoussiere.position.y) * amorti;
+
+    // Où vise la souris ?
+    pointe = null;
+    if (sourisDedans && arrivee >= 1) {
+      scene.updateMatrixWorld();
+      rayon.setFromCamera(souris, camera);
+      sphere.getWorldPosition(boule.center);
+      boule.radius = 1.05 * monde.scale.x;
+      if (rayon.ray.intersectSphere(boule, touche)) pointe = sphere.worldToLocal(touche).normalize();
+    }
+    matiereViseur.opacity += ((pointe ? 0.95 : 0) - matiereViseur.opacity) * Math.min(1, dt * 8);
+    if (pointe) {
+      viseur.position.copy(pointe).multiplyScalar(1.08);
+      viseur.quaternion.setFromUnitVectors(AXE_Z, pointe);
+    }
+    croix.rotation.z += dt * 1.5;
+    croix.scale.setScalar(0.11 * (1 + Math.sin(temps * 5) * 0.08));
+
+    // Nœuds : rassemblement, respiration, bosse et lueur sous la souris
+    for (let i = 0; i < N; i++) {
+      let f = 0;
+      if (pointe) f = Math.max(0, 1 - base[i].distanceTo(pointe) / 0.55) ** 2;
+      eclat[i] = Math.max(eclat[i] - dt * 1.1, f);
+      const k = sortieCubique(entre(arrivee * 1.5 - retard[i], 0, 1));
+      tmp.copy(base[i]).multiplyScalar(1 + f * 0.2 + Math.sin(temps * 1.4 + i) * 0.01);
+      courant[i].lerpVectors(depart[i], tmp, k).toArray(noeuds.pos, i * 3);
+      noeuds.taille[i] = 0.05 + eclat[i] * 0.07;
+      noeuds.alpha[i] = (0.75 + eclat[i] * 0.25) * Math.max(k, 0.15);
+      noeuds.teinte[i] = eclat[i] * 0.9;
+    }
+    noeuds.maj();
+
+    paires.forEach(([a, b], j) => {
+      courant[a].toArray(posLiens, j * 6);
+      courant[b].toArray(posLiens, j * 6 + 3);
+      eclatLiens[j * 2] = eclat[a];
+      eclatLiens[j * 2 + 1] = eclat[b];
+    });
+    geoLiens.attributes.position.needsUpdate = true;
+    geoLiens.attributes.aEclat.needsUpdate = true;
+    const liensVisibles = entre(arrivee, 0.55, 1);
+    matiereLiens.uniforms.uOpacite.value = 0.2 * liensVisibles;
+
+    impulsions.forEach((p, i) => {
+      p.t += p.v * dt * (1 + eclat[p.a] * 2);
+      if (p.t >= 1) {
+        p.t -= 1;
+        p.a = p.b;
+        p.b = voisins[p.a][Math.floor(Math.random() * voisins[p.a].length)];
+      }
+      tmp.lerpVectors(courant[p.a], courant[p.b], p.t).toArray(nuageImpulsions.pos, i * 3);
+      nuageImpulsions.alpha[i] = liensVisibles;
+    });
+    nuageImpulsions.maj();
+
+    // Bouclier : surgit au centre, puis flotte
+    const surgit = entre(temps, 0.9, 2.1);
+    bouclier.scale.setScalar(0.42 * Math.max(0.001, sortieRessort(surgit)));
+    bouclier.rotation.y = Math.sin(temps * 0.6) * 0.55 + (1 - sortieCubique(surgit)) * Math.PI * 3;
+    bouclier.position.y = Math.sin(temps * 1.1) * 0.035;
+    halo.alpha[0] = 0.3 + Math.sin(temps * 2) * 0.08 + flashBulle * 0.3;
+    halo.maj();
+
+    orbites.forEach((o, i) => {
+      o.pivot.scale.setScalar(Math.max(0.001, sortieCubique(entre(temps, 1.2 + i * 0.2, 2.4 + i * 0.2))));
+      o.tour.rotation.y += dt * o.v;
+    });
+
+    // Fin de l'arrivée : la bulle s'allume d'un coup et lâche une gerbe d'étincelles
+    if (!demarre && arrivee >= 1) {
+      demarre = true;
+      flashBulle = 1;
+      for (let k = 0; k < 6; k++) onde(base[Math.floor(Math.random() * N)].clone().multiplyScalar(RAYON_BULLE), 0.5);
+      for (let k = 0; k < 160; k++) {
+        const p = directionAuHasard().multiplyScalar(RAYON_BULLE);
+        emettre(p, p.clone().multiplyScalar(0.6 + Math.random() * 0.8), 0.8 + Math.random() * 0.8, 0.03 + Math.random() * 0.04, Math.random() < 0.5 ? 0 : 1);
+      }
+    }
+
+    if (arrivee >= 1 && (prochaineAttaque -= dt) <= 0) {
+      lancerAttaque();
+      prochaineAttaque = 0.6 + Math.random() * 1.5;
+    }
+    for (let i = attaques.length - 1; i >= 0; i--) {
+      const a = attaques[i];
+      a.t += a.v * dt;
+      a.pos.lerpVectors(a.depart, a.arrivee, Math.min(1, a.t) ** 1.6);
+      if (dt > 0) {
+        emettre(a.pos, directionAuHasard(tmp).multiplyScalar(0.05), 0.45, 0.07, 2);
+        emettre(a.pos, tmp.set(0, 0, 0), 0.05, 0.13, 2);
+      }
+      if (a.t >= 1) {
+        impact(a.arrivee);
+        attaques.splice(i, 1);
+      }
+    }
+    majEtincelles(dt);
+
+    ondes.forEach((o) => {
+      if (o.t >= 1) return;
+      o.t = Math.min(1, o.t + dt / 0.9);
+      o.m.scale.setScalar(0.01 + sortieCubique(o.t) * o.taille);
+      o.m.material.opacity = (1 - o.t) * 0.7;
+      o.m.visible = o.t < 1;
+    });
+
+    flashBulle = Math.max(0, flashBulle - dt * 1.4);
+    matiereBulle.opacity = 0.04 * liensVisibles + flashBulle * 0.3;
+  }
+
+  const { rafraichir, reduit } = boucle3d({
+    canevas, zone, rendu, scene, camera, etape,
+    redimensionner: (echelle) => (uniformes.uEchelle.value = echelle),
+  });
+  // Image fixe : directement l'état final, sans la gerbe de l'arrivée
+  if (reduit.matches) {
+    temps = 10;
+    demarre = true;
+  }
+  couleurs();
+  surChangementTheme(() => { couleurs(); rafraichir(); });
+}
+reseau3d();
+
+// Méthode : une houle de points sous les étapes ; elle se soulève sous la souris, un clic lance une vague
+function terrain3d() {
+  const canevas = $("terrain3d");
+  const rendu = creerRendu(canevas);
+  if (!rendu) return;
+  const zone = canevas.closest(".methode") || canevas;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 3.2, 8);
+  camera.lookAt(0, -0.4, -4);
+
+  const COLONNES = 140, RANGEES = 60;
+  const pos = new Float32Array(COLONNES * RANGEES * 3);
+  for (let i = 0; i < COLONNES; i++) {
+    for (let j = 0; j < RANGEES; j++) {
+      const k = (i * RANGEES + j) * 3;
+      pos[k] = (i / (COLONNES - 1) - 0.5) * 34;
+      pos[k + 2] = 5 - (j / (RANGEES - 1)) * 26;
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const uniformes = {
+    uTemps: { value: 0 }, uEchelle: { value: 600 },
+    uSouris: { value: new THREE.Vector2(0, 0) }, uForce: { value: 0 },
+    uOnde: { value: new THREE.Vector3(0, 0, -100) },
+    // Section toujours sombre : couleurs fixes de la palette sombre
+    uBleu: { value: new THREE.Color("#7f9eff") }, uVert: { value: new THREE.Color("#5cc98d") },
+  };
+  const matiere = new THREE.ShaderMaterial({
+    uniforms: uniformes, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `
+      uniform float uTemps; uniform float uEchelle; uniform vec2 uSouris; uniform float uForce; uniform vec3 uOnde;
+      varying float vHaut; varying float vAlpha;
+      void main() {
+        vec3 p = position;
+        float h = sin(p.x * 0.5 + uTemps * 0.8) * 0.22 + cos(p.z * 0.65 - uTemps * 0.6) * 0.18 + sin((p.x + p.z) * 0.3 + uTemps * 0.45) * 0.15;
+        float d = distance(p.xz, uSouris);
+        h += uForce * (exp(-d * d * 0.3) * 0.75 + sin(d * 2.2 - uTemps * 4.0) * exp(-d * 0.45) * 0.18);
+        float age = uTemps - uOnde.z;
+        float dOnde = distance(p.xz, uOnde.xy);
+        h += step(0.0, age) * exp(-pow(dOnde - age * 7.0, 2.0) * 1.2) * exp(-age * 0.8) * 1.1;
+        p.y += h;
+        vHaut = h;
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        gl_PointSize = (0.05 + max(h, 0.0) * 0.025) * uEchelle / -mv.z;
+        gl_Position = projectionMatrix * mv;
+        vAlpha = smoothstep(30.0, 9.0, -mv.z);
+      }`,
+    fragmentShader: `
+      uniform vec3 uBleu; uniform vec3 uVert; varying float vHaut; varying float vAlpha;
+      void main() {
+        float d = length(gl_PointCoord - 0.5);
+        float a = smoothstep(0.5, 0.0, d) * vAlpha * (0.3 + clamp(vHaut, 0.0, 1.0) * 0.45);
+        if (a < 0.01) discard;
+        gl_FragColor = vec4(mix(uBleu, uVert, clamp(vHaut * 1.1, 0.0, 1.0)), a);
+      }`,
+  });
+  const points = new THREE.Points(geo, matiere);
+  points.frustumCulled = false;
+  scene.add(points);
+
+  const rayon = new THREE.Raycaster(), sol = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), touche = new THREE.Vector3();
+  const souris = new THREE.Vector2();
+  let dedans = false, cible = null;
+  zone.addEventListener("pointermove", (e) => {
+    const r = canevas.getBoundingClientRect();
+    souris.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    dedans = true;
+  });
+  zone.addEventListener("pointerleave", () => (dedans = false));
+  zone.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("a, button") || !cible) return;
+    uniformes.uOnde.value.set(cible.x, cible.z, uniformes.uTemps.value);
+  });
+
+  function etape(dt) {
+    uniformes.uTemps.value += dt;
+    cible = null;
+    if (dedans) {
+      rayon.setFromCamera(souris, camera);
+      if (rayon.ray.intersectPlane(sol, touche)) cible = touche;
+    }
+    const amorti = Math.min(1, dt * 4);
+    if (cible) uniformes.uSouris.value.lerp(new THREE.Vector2(cible.x, cible.z), amorti);
+    uniformes.uForce.value += ((cible ? 1 : 0) - uniformes.uForce.value) * Math.min(1, dt * 2);
+  }
+
+  boucle3d({ canevas, zone, rendu, scene, camera, etape, redimensionner: (echelle) => (uniformes.uEchelle.value = echelle) });
+}
+terrain3d();
+
+// Objectifs : des milliers de particules se reforment en une icône par objectif au fil du défilement
+// (serveur → réseau → bouclier → cible → terminal). Sans 3D ou en mouvement réduit, la liste reste simple.
+function objectifs3d() {
+  const section = $("domaines");
+  const canevas = $("objectifs3d");
+  if (!section || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const rendu = creerRendu(canevas);
+  if (!rendu) return;
+  section.classList.add("anime");
+  const textes = [...section.querySelectorAll(".objectif")];
+  const boutons = [...section.querySelectorAll(".objectifs-rail button")];
+
+  // Icônes dessinées dans une grille 24 × 24, puis échantillonnées en points
+  const ICONES = [
+    { teinte: 0, dessin: (g) => { // serveur : administrer
+      g.stroke(new Path2D("M5 3h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"));
+      g.stroke(new Path2D("M5 13h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"));
+      [7, 17].forEach((y) => { g.beginPath(); g.arc(7, y, 1.1, 0, Math.PI * 2); g.fill(); });
+      g.stroke(new Path2D("M12 7h5M12 17h5"));
+    } },
+    { teinte: 0.5, dessin: (g) => { // réseau : connecter
+      [[12, 4], [4, 19], [20, 19]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 2.6, 0, Math.PI * 2); g.stroke(); });
+      g.stroke(new Path2D("M12 6.6v5M12 11.6L5.8 17M12 11.6l6.2 5.4"));
+      g.beginPath(); g.arc(12, 11.6, 1.3, 0, Math.PI * 2); g.fill();
+    } },
+    { teinte: 1, dessin: (g) => { // bouclier : protéger
+      g.save(); g.scale(0.75, 0.75);
+      g.lineWidth = 2.2 / 0.75;
+      g.stroke(new Path2D("M16 3 27 7.5v8.2c0 6.6-4.6 11.4-11 13.3C9.6 27.1 5 22.3 5 15.7V7.5z"));
+      g.stroke(new Path2D("M11 16l3.5 3.5 6.5-7"));
+      g.restore();
+    } },
+    { teinte: 2, dessin: (g) => { // cible : tester
+      [10, 6].forEach((r) => { g.beginPath(); g.arc(12, 12, r, 0, Math.PI * 2); g.stroke(); });
+      g.beginPath(); g.arc(12, 12, 2, 0, Math.PI * 2); g.fill();
+      g.stroke(new Path2D("M12 -1v5M12 20v5M-1 12h5M20 12h5"));
+    } },
+    { teinte: 0.25, dessin: (g) => { // terminal : automatiser
+      g.stroke(new Path2D("M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"));
+      g.stroke(new Path2D("M6.5 9l3.5 3-3.5 3M12.5 15.5h5"));
+    } },
+  ];
+  const N = innerWidth < 700 ? 2600 : 4200;
+  const T = 180, TAILLE = 2.6;
+  const formes = ICONES.map(({ dessin }) => {
+    const c = document.createElement("canvas");
+    c.width = c.height = T;
+    const g = c.getContext("2d");
+    g.translate(T / 2, T / 2);
+    g.scale(T / 28, T / 28);
+    g.translate(-12, -12);
+    g.strokeStyle = g.fillStyle = "#fff";
+    g.lineWidth = 2.2;
+    g.lineCap = g.lineJoin = "round";
+    dessin(g);
+    const donnees = g.getImageData(0, 0, T, T).data;
+    const pleins = [];
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) if (donnees[(y * T + x) * 4 + 3] > 120) pleins.push(x, y);
+    const sortie = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const k = Math.floor(Math.random() * (pleins.length / 2)) * 2;
+      sortie[i * 3] = ((pleins[k] + Math.random()) / T - 0.5) * TAILLE;
+      sortie[i * 3 + 1] = -((pleins[k + 1] + Math.random()) / T - 0.5) * TAILLE;
+      sortie[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
+    }
+    return sortie;
+  });
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.z = 6;
+  const uniformes = {
+    uAccent: { value: new THREE.Color() }, uBas: { value: new THREE.Color() }, uCrit: { value: new THREE.Color() },
+    uEchelle: { value: 600 }, uTemps: { value: 0 },
+  };
+  const groupe = new THREE.Group();
+  scene.add(groupe);
+  const particules = nuagePoints(N, uniformes);
+  groupe.add(particules.objet);
+  const retard = new Float32Array(N), graine = new Float32Array(N), decalage = new Float32Array(N * 2);
+  for (let i = 0; i < N; i++) {
+    retard[i] = Math.random();
+    graine[i] = Math.random() * 100;
+    particules.taille[i] = 0.022 + Math.random() * 0.03;
+  }
+
+  // Ambiance : poussière lointaine qui scintille
+  const ambiance = nuagePoints(700, uniformes, 1);
+  for (let i = 0; i < 700; i++) {
+    ambiance.pos[i * 3] = (Math.random() - 0.5) * 16;
+    ambiance.pos[i * 3 + 1] = (Math.random() - 0.5) * 9;
+    ambiance.pos[i * 3 + 2] = -1 - Math.random() * 6;
+    ambiance.taille[i] = 0.015 + Math.random() * 0.03;
+    ambiance.alpha[i] = 0.5;
+    ambiance.teinte[i] = Math.random() < 0.15 ? 1 : 0;
+  }
+  ambiance.maj();
+  scene.add(ambiance.objet);
+
+  // Souris : les particules s'écartent du curseur
+  const souris = new THREE.Vector2(), touche = new THREE.Vector3(), plan = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  const rayon = new THREE.Raycaster(), cibleIncl = { x: 0, y: 0 };
+  let dedans = false, curseur = null;
+  section.addEventListener("pointermove", (e) => {
+    const r = canevas.getBoundingClientRect();
+    souris.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    cibleIncl.x = souris.y * -0.25;
+    cibleIncl.y = souris.x * 0.4;
+    dedans = true;
+  });
+  section.addEventListener("pointerleave", () => (dedans = false));
+
+  // Le rail mène directement à un objectif
+  const position = (i) => section.offsetTop + (i / (ICONES.length - 1)) * (section.offsetHeight - canevas.clientHeight) * 0.999;
+  boutons.forEach((b, i) => b.addEventListener("click", () => scrollTo({ top: position(i) - 68, behavior: "smooth" })));
+
+  let etapeAffichee = 0, actif = -1, temps = 0;
+  function etape(dt) {
+    temps += dt;
+    uniformes.uTemps.value = temps;
+
+    // Progression du défilement dans la section : 0 → 4, avec un palier sur chaque icône
+    const r = section.getBoundingClientRect();
+    const p = entre(-r.top + 68, 0, section.offsetHeight - canevas.clientHeight);
+    const brut = p * (ICONES.length - 1);
+    const base = Math.min(Math.floor(brut), ICONES.length - 2);
+    const cible = base + (brut >= ICONES.length - 1 ? 1 : entre(brut - base, 0.3, 0.75));
+    etapeAffichee += (cible - etapeAffichee) * (dt ? Math.min(1, dt * 5) : 1);
+
+    const nouvelActif = Math.min(ICONES.length - 1, Math.round(etapeAffichee));
+    if (nouvelActif !== actif) {
+      actif = nouvelActif;
+      textes.forEach((t, i) => t.classList.toggle("actif", i === actif));
+      boutons.forEach((b, i) => { b.classList.toggle("actif", i === actif); b.classList.toggle("fait", i < actif); });
+    }
+
+    // Disposition : icône à droite du texte sur grand écran, au-dessus sur téléphone
+    const demiH = camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const demiL = demiH * camera.aspect;
+    const large = camera.aspect > 1.1;
+    groupe.position.set(large ? demiL * 0.42 : 0, large ? 0 : demiH * 0.42, 0);
+    groupe.scale.setScalar(large ? Math.min(1.25, demiH * 0.55) : Math.min(demiL * 0.62, demiH * 0.4));
+    const amorti = Math.min(1, dt * 3);
+    groupe.rotation.x += (cibleIncl.x - groupe.rotation.x) * amorti;
+    groupe.rotation.y += (cibleIncl.y + Math.sin(temps * 0.5) * 0.25 - groupe.rotation.y) * amorti;
+
+    curseur = null;
+    if (dedans) {
+      scene.updateMatrixWorld();
+      rayon.setFromCamera(souris, camera);
+      plan.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 0, 1).applyQuaternion(groupe.quaternion), groupe.position);
+      if (rayon.ray.intersectPlane(plan, touche)) curseur = groupe.worldToLocal(touche);
+    }
+
+    const i0 = Math.min(Math.floor(etapeAffichee), ICONES.length - 2);
+    const f = etapeAffichee - i0;
+    const A = formes[i0], B = formes[i0 + 1];
+    const teinteA = ICONES[i0].teinte, teinteB = ICONES[i0 + 1].teinte;
+    const souffle = 1 + Math.sin(temps * 1.6) * 0.012;
+    for (let i = 0; i < N; i++) {
+      // Chaque particule part à son moment et tourbillonne pendant le trajet
+      const k = sortieCubique(entre(f, retard[i] * 0.35, 0.65 + retard[i] * 0.35));
+      const vol = Math.sin(Math.PI * k);
+      const s = graine[i];
+      let x = (A[i * 3] + (B[i * 3] - A[i * 3]) * k) * souffle + Math.sin(s + temps * 1.3) * vol * 0.9;
+      let y = (A[i * 3 + 1] + (B[i * 3 + 1] - A[i * 3 + 1]) * k) * souffle + Math.cos(s * 1.7 + temps * 1.1) * vol * 0.9;
+      const z = A[i * 3 + 2] + (B[i * 3 + 2] - A[i * 3 + 2]) * k + Math.sin(s * 2.3 + temps) * vol * 1.2;
+
+      // Écart autour du curseur, qui revient en douceur
+      let ex = decalage[i * 2] * Math.exp(-4 * dt), ey = decalage[i * 2 + 1] * Math.exp(-4 * dt);
+      if (curseur) {
+        const dx = x + ex - curseur.x, dy = y + ey - curseur.y, d2 = dx * dx + dy * dy;
+        if (d2 < 0.36) {
+          const d = Math.sqrt(d2) || 0.001, force = (0.6 - d) * 0.5;
+          ex += (dx / d) * force * 0.35;
+          ey += (dy / d) * force * 0.35;
+        }
+      }
+      decalage[i * 2] = ex;
+      decalage[i * 2 + 1] = ey;
+      particules.pos[i * 3] = x + ex;
+      particules.pos[i * 3 + 1] = y + ey;
+      particules.pos[i * 3 + 2] = z;
+      particules.alpha[i] = 0.55 + 0.45 * Math.sin(s + temps * 2) ** 2;
+      particules.teinte[i] = teinteA + (teinteB - teinteA) * k;
+    }
+    particules.maj();
+    ambiance.objet.rotation.z = temps * 0.01;
+  }
+
+  function couleurs() {
+    const theme = lireTheme();
+    uniformes.uAccent.value.copy(theme.accent);
+    uniformes.uBas.value.copy(theme.bas);
+    uniformes.uCrit.value.copy(theme.crit);
+    [particules, ambiance].forEach((n) => {
+      n.matiere.blending = theme.sombre ? THREE.AdditiveBlending : THREE.NormalBlending;
+      n.matiere.needsUpdate = true;
+    });
+  }
+  const { rafraichir } = boucle3d({
+    canevas, zone: section, rendu, scene, camera, etape,
+    redimensionner: (echelle) => (uniformes.uEchelle.value = echelle),
+  });
+  couleurs();
+  surChangementTheme(() => { couleurs(); rafraichir(); });
+}
+objectifs3d();
+
+// Particules au premier plan sur toute la page : poussières qui flottent devant le contenu,
+// traînée d'étincelles derrière le curseur, gerbe à chaque clic.
+function premierPlan() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const canevas = document.createElement("canvas");
+  const ctx = canevas.getContext("2d");
+  if (!ctx) return;
+  canevas.className = "premier-plan";
+  canevas.setAttribute("aria-hidden", "true");
+  document.body.append(canevas);
+  const pointeurFin = matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  let l = 0, h = 0;
+  function dimensionner() {
+    const densite = Math.min(devicePixelRatio, 2);
+    l = innerWidth;
+    h = innerHeight;
+    canevas.width = l * densite;
+    canevas.height = h * densite;
+    ctx.setTransform(densite, 0, 0, densite, 0, 0);
+  }
+  addEventListener("resize", dimensionner);
+  dimensionner();
+
+  // Une pastille floue pré-dessinée par couleur (accent, vert, rouge)
+  let pastilles = [], sombre = false;
+  function pastille(hex) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d");
+    const v = parseInt(hex.replace("#", "").padEnd(6, "0").slice(0, 6), 16);
+    const rgb = `${v >> 16}, ${(v >> 8) & 255}, ${v & 255}`;
+    const d = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    d.addColorStop(0, `rgba(${rgb}, 1)`);
+    d.addColorStop(0.3, `rgba(${rgb}, .8)`);
+    d.addColorStop(1, `rgba(${rgb}, 0)`);
+    g.fillStyle = d;
+    g.fillRect(0, 0, 64, 64);
+    return c;
+  }
+  function couleurs() {
+    const style = getComputedStyle(document.documentElement);
+    pastilles = [["--accent", "#2348c9"], ["--bas", "#2f7d55"], ["--crit", "#b4232a"]]
+      .map(([nom, defaut]) => pastille(style.getPropertyValue(nom).trim() || defaut));
+    const theme = document.documentElement.dataset.theme;
+    sombre = theme ? theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  couleurs();
+  surChangementTheme(couleurs);
+
+  const flottants = Array.from({ length: l < 700 ? 16 : 32 }, () => ({
+    x: Math.random(), y: Math.random(), z: 0.25 + Math.random() * 0.75,
+    v: 0.01 + Math.random() * 0.025, phase: Math.random() * 6.3, teinte: Math.random() < 0.25 ? 1 : 0,
+  }));
+  const etincelles = [];
+  const souris = { x: l / 2, y: h / 2, px: -1, py: -1 };
+
+  function emettre(x, y, vx, vy, vie, taille, teinte) {
+    if (etincelles.length > 400) etincelles.shift();
+    etincelles.push({ x, y, vx, vy, vie, vieMax: vie, taille, teinte });
+  }
+  addEventListener("pointermove", (e) => {
+    souris.x = e.clientX;
+    souris.y = e.clientY;
+    if (!pointeurFin || e.pointerType !== "mouse") return;
+    const dx = e.clientX - souris.px, dy = e.clientY - souris.py;
+    if (souris.px >= 0 && dx * dx + dy * dy > 36) {
+      emettre(e.clientX, e.clientY, dx * 0.6 + (Math.random() - 0.5) * 30, dy * 0.6 + (Math.random() - 0.5) * 30,
+        0.5 + Math.random() * 0.4, 2 + Math.random() * 3, Math.random() < 0.3 ? 1 : 0);
+    }
+    souris.px = e.clientX;
+    souris.py = e.clientY;
+  }, { passive: true });
+  addEventListener("pointerdown", (e) => {
+    if (e.target.closest("input, select, textarea")) return;
+    for (let k = 0; k < 26; k++) {
+      const a = (k / 26) * Math.PI * 2 + Math.random() * 0.2, v = 90 + Math.random() * 180;
+      emettre(e.clientX, e.clientY, Math.cos(a) * v, Math.sin(a) * v, 0.5 + Math.random() * 0.5, 2 + Math.random() * 3.5, k % 3 === 0 ? 1 : 0);
+    }
+  }, { passive: true });
+
+  let avant = 0, temps = 0;
+  function image(t) {
+    const dt = avant ? Math.min((t - avant) / 1000, 0.05) : 1 / 60;
+    avant = t;
+    temps += dt;
+    ctx.clearRect(0, 0, l, h);
+    ctx.globalCompositeOperation = sombre ? "lighter" : "source-over";
+    const defile = scrollY;
+
+    // Poussières : plus elles sont proches, plus elles sont grosses, floues et rapides au défilement
+    flottants.forEach((p) => {
+      const portee = h * 1.3;
+      let y = (p.y * portee - temps * p.v * h - defile * p.z * 0.4) % portee;
+      if (y < 0) y += portee;
+      y -= h * 0.15;
+      const x = p.x * l + Math.sin(temps * 0.4 + p.phase) * 30 * p.z - (souris.x / l - 0.5) * 60 * p.z;
+      const r = 3 + p.z * 14;
+      ctx.globalAlpha = (sombre ? 0.1 : 0.07) + p.z * (sombre ? 0.16 : 0.1);
+      ctx.drawImage(pastilles[p.teinte], x - r, y - r, r * 2, r * 2);
+    });
+
+    for (let i = etincelles.length - 1; i >= 0; i--) {
+      const s = etincelles[i];
+      s.vie -= dt;
+      if (s.vie <= 0) { etincelles.splice(i, 1); continue; }
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vx *= Math.exp(-3 * dt);
+      s.vy = s.vy * Math.exp(-3 * dt) + 40 * dt;
+      const k = s.vie / s.vieMax, r = s.taille * (0.4 + 0.6 * k) * 2;
+      ctx.globalAlpha = k * (sombre ? 0.9 : 0.7);
+      ctx.drawImage(pastilles[s.teinte], s.x - r, s.y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(image);
+  }
+  requestAnimationFrame(image);
+}
+premierPlan();
+</script>
