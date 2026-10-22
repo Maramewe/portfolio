@@ -177,15 +177,6 @@ section { padding-block: clamp(4rem, 8vw, 6.5rem); }
 .service p { color: var(--encre-douce); font-size: .98rem; }
 .service ul { margin: .3rem 0 0; padding: 0; list-style: none; display: grid; gap: .35rem; font: 400 .8rem/1.4 var(--f-mono); color: var(--encre-douce); }
 .service ul li::before { content: "› "; color: var(--accent); }
-[hidden] { display: none !important; }
-.projets-filtres { margin-bottom: 1.75rem; }
-#projets-liste { background: none; border: 0; border-radius: 0; overflow: visible; gap: 1.25rem; }
-.projet { border: 1px solid var(--trait); border-radius: 14px; }
-.projet .categories { display: flex; flex-wrap: wrap; gap: .4rem; }
-.projet .categories span { font: 500 .72rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-doux); padding: .35rem .55rem; border-radius: 6px; }
-.projet img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid var(--trait); }
-.projet .lien-code { font: 500 .85rem/1 var(--f-mono); text-decoration: none; margin-top: .4rem; }
-.projet .lien-code:hover { text-decoration: underline; }
 
 /* Méthode */
 .methode { background: var(--nuit); color: var(--sur-nuit); }
@@ -418,7 +409,6 @@ details p { padding: 0 0 1.3rem; color: var(--encre-douce); max-width: 60ch; }
     </a>
     <nav class="nav" aria-label="Navigation principale">
       <a href="#domaines">Domaines</a>
-      <a href="#projets" id="nav-projets" hidden>Projets</a>
       <a href="#labs">Labs</a>
       <a href="#parcours">Parcours</a>
       <a href="#questions">Questions</a>
@@ -563,18 +553,6 @@ details p { padding: 0 0 1.3rem; color: var(--encre-douce); max-width: 60ch; }
     </div>
   </section>
 
-  <section id="projets" hidden>
-    <div class="enveloppe">
-      <div class="entete-section">
-        <span class="surtitre">Projets</span>
-        <h2>Ce que je construis, rangé par thème.</h2>
-        <p>Chaque projet a son dépôt sur GitHub, avec son code et sa documentation.</p>
-      </div>
-      <div class="choix projets-filtres" id="projets-filtres" role="radiogroup" aria-label="Filtrer les projets par thème"></div>
-      <div class="services" id="projets-liste"></div>
-    </div>
-  </section>
-
   <section class="methode" id="parcours">
     <canvas class="terrain3d" id="terrain3d" aria-hidden="true"></canvas>
     <div class="enveloppe">
@@ -676,70 +654,10 @@ const CONFIG = {
   zone: "Toulouse et alentours",
   domaine: "juan-fajardo.pages.dev", // adresse du site en ligne
 };
-// Projets affichés dans la section « Projets » (elle reste cachée tant que la liste est vide).
-// Pour en ajouter un, copier une ligne d'exemple, enlever les // du début et remplir :
-//   nom        : le titre affiché
-//   categories : une ou plusieurs clés de CATEGORIES ci-dessous
-//   texte      : une phrase qui dit ce que fait le projet
-//   depot      : le nom du dépôt sur github.com/Maramewe
-//   image      : (facultatif) une capture mise dans images/projets/, par exemple "projets/infos-systeme.png"
-const PROJETS = [
-  // { nom: "infos-systeme", categories: ["bash", "linux"], texte: "Résumé d’une machine Linux en un coup d’œil.", depot: "infos-systeme" },
-  // { nom: "Scanner de ports", categories: ["python", "reseau", "securite"], texte: "Détecte les ports ouverts d’une machine de mon lab.", depot: "scanner-ports", image: "projets/scanner-ports.png" },
-];
-const CATEGORIES = { linux: "Linux", bash: "Bash", python: "Python", reseau: "Réseau", securite: "Sécurité", windows: "Windows" };
 // === FIN DE LA PARTIE À PERSONNALISER ===
 
 const $ = (id) => document.getElementById(id);
 const sansProtocole = (url) => url.replace(/^https:\/\/(www\.)?/, "");
-
-// Projets : cartes construites avec createElement/textContent (aucun HTML injecté depuis la liste)
-function projets() {
-  if (!PROJETS.length) return;
-  $("projets").hidden = false;
-  $("nav-projets").hidden = false;
-  const element = (balise, classe, texte) => {
-    const e = document.createElement(balise);
-    if (classe) e.className = classe;
-    if (texte) e.textContent = texte;
-    return e;
-  };
-  const cartes = PROJETS.map((p) => {
-    const carte = element("article", "service projet");
-    if (p.image) {
-      const img = element("img");
-      img.src = "images/" + p.image;
-      img.alt = "Capture de " + p.nom;
-      img.loading = "lazy";
-      carte.append(img);
-    }
-    const categories = element("div", "categories");
-    p.categories.forEach((c) => categories.append(element("span", "", CATEGORIES[c] || c)));
-    const lien = element("a", "lien-code", "Voir le code ↗");
-    lien.href = `${CONFIG.github}/${p.depot}`;
-    carte.append(categories, element("h3", "", p.nom), element("p", "", p.texte), lien);
-    carte.dataset.categories = p.categories.join(" ");
-    return carte;
-  });
-  $("projets-liste").replaceChildren(...cartes);
-
-  // Un onglet « Tous », puis un par catégorie réellement utilisée
-  const utilisees = Object.keys(CATEGORIES).filter((c) => PROJETS.some((p) => p.categories.includes(c)));
-  $("projets-filtres").replaceChildren(...["tous", ...utilisees].map((c) => {
-    const etiquette = element("label");
-    const choix = element("input");
-    choix.type = "radio";
-    choix.name = "filtre-projets";
-    choix.value = c;
-    choix.checked = c === "tous";
-    choix.addEventListener("change", () => cartes.forEach((carte) => {
-      carte.hidden = c !== "tous" && !carte.dataset.categories.split(" ").includes(c);
-    }));
-    etiquette.append(choix, element("span", "", c === "tous" ? "Tous" : CATEGORIES[c]));
-    return etiquette;
-  }));
-}
-projets();
 
 // Coordonnées et pied de page
 $("c-email").textContent = CONFIG.email;
